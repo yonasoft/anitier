@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   root "static_pages#hello_world"
 end
