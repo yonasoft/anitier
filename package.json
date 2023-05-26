@@ -1,7 +1,6 @@
 {
   "name": "anitier",
   "private": true,
-  "dependencies": {},
   "version": "0.1.0",
   "devDependencies": {
     "@babel/plugin-proposal-private-methods": "^7.18.6",
