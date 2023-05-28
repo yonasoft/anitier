@@ -11,7 +11,7 @@
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "5.4.4",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "bootstrap": "5.2.0",
+    "bootstrap": "^5.2.3",
     "jquery": "^3.7.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
