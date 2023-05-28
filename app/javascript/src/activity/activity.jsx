@@ -13,21 +13,20 @@ export default function Activity() {
       <NavBar />
       <div className="container">
         <div className="row">
-          <div className="col-2"></div>
-          <div className="col-8 bg-light py-2 d-flex justify-content-between">
-            <h1>Activity</h1>
-            <div class="btn-group">
-              <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                <option selected value="1">Recent</option>
+          <div className="col-12 bg-light py-2 d-flex">
+            <h1 className="me-auto">Activity</h1>
+            <div className="btn-group ms-auto">
+              <select defaultValue="1" className="form-select form-select-lg" aria-label=" example">
+                <option value="1">Recent</option>
                 <option value="2">Hot</option>
                 <option value="3">Top</option>
               </select>
             </div>
+          </div>
+          <div className="col-12 bg-light">
             <div id="activities" className="row">
-
             </div>
           </div>
-          <div className="col-2"></div>
         </div>
       </div>
     </div>

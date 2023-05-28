@@ -19,14 +19,9 @@ export default function Create() {
   }
 
   return (
-    <div id="root">
-      <NavBar />
-      <div className="container">
-        <div className="row">
-          {step === 0 && <CreateSetup nextStep={nextStep} />}
-          {step === 1 && <CreateBuild nextStep={nextStep} previousStep={previousStep} />}
-        </div>
-      </div>
+    <div className='root'>
+      {step === 0 && <CreateSetup nextStep={nextStep} />}
+      {step === 1 && <CreateBuild nextStep={nextStep} previousStep={previousStep} />}
     </div>
   )
 }
