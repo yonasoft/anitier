@@ -14,7 +14,7 @@ export default function CreateSetup({ nextStep }) {
                     <div className="col-8 bg-light py-2">
                         <h1>Create(Setup)</h1>
                         <div className="form-floating mb-3">
-                            <input type="text" className="form-control form-control-lg" id="title" value="" onChange={ } />
+                            <input type="text" className="form-control form-control-lg" id="title" />
                             <label htmlFor="title">Title</label>
                         </div>
                     </div>
