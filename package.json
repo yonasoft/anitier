@@ -20,5 +20,8 @@
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3"
+  },
+  "dependencies": {
+    "react-bootstrap": "^2.7.4"
   }
 }
