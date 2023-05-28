@@ -1,11 +1,11 @@
 // index.jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Login from './login';
+import Activity from './activity';
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-        <Login />,
+        <Activity />,
         document.body.appendChild(document.createElement('div')),
     )
 })
