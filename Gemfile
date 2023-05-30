@@ -28,6 +28,7 @@ gem 'bootstrap-sass'
 
 gem 'jquery-rails'
 
+
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false
 
@@ -54,6 +55,12 @@ group :test do
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
 end
+
+group :production do
+  # Use pg as the database for Active Record
+  gem 'pg', '~> 1.4.3'
+end
+
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

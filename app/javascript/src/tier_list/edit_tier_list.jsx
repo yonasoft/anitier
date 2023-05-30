@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import './create.scss';
+import './tier_list.scss';
 import NavBar from '../navbar/navbar'
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 
-export default function CreateBuild({ nextStep, previousStep }) {
+export default function EditTierList({tierList}) {
 
     const [showModal, setShowModal] = useState(false);
 
@@ -22,10 +22,9 @@ export default function CreateBuild({ nextStep, previousStep }) {
                 <div className="row">
                     <div className='d-flex justify-content-between'>
                         <h1 className="my-2 ">
-                            Create(Build)
+                            Edit Tier List
                         </h1>
                         <div>
-                            <Button className="mx-2 my-2 btn-secondary" onClick={previousStep}>Back</Button>
                             <Button className="mx-2 my-2">Save</Button>
                             <a className="mx-2 my-2 btn btn-secondary" href="/">Finish</a>
                         </div>

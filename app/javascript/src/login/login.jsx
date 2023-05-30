@@ -15,6 +15,7 @@ export default function Login() {
       <div className="container-fluid">
         <div className="row">
           <div id="welcome-area" className="col-0 col-lg-6">
+            <h1>TBA</h1>
           </div>
           <div id="login-area" className="col-12 col-lg-6 bg-white d-flex align-items-center justify-content-center">
             {requireSignup ? <SignUpWidget setRequireSignup={setRequireSignup} /> : <LoginWidget setRequireSignup={setRequireSignup} />}

@@ -12,4 +12,9 @@ class StaticPagesController < ApplicationController
         render 'activity'
     end
     
+    def tier_list
+    end    
+
+    def templates
+    end
 end

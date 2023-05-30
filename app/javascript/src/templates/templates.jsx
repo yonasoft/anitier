@@ -1,12 +1,9 @@
-// home.jsx
 import React, { useState } from 'react';
-import './activity.scss';
+import './templates.scss';
 import NavBar from '../navbar/navbar'
 import TierColumn from '../tierlist_column/tier_column';
 
-export default function Activity() {
-
-  const [activities, setRequireSignup] = useState([]);
+export default function Templates() {
 
   return (
     <div id="root">
@@ -15,16 +12,17 @@ export default function Activity() {
         <div className="row">
           <div className="col-12 bg-light py-2">
             <div className="d-flex">
-              <h1 className="me-auto">Activity</h1>
+              <h1 className="me-auto">Templates</h1>
               <div className="btn-group ms-auto">
                 <select defaultValue="1" className="form-select form-select-lg" aria-label=" example">
-                  <option value="1">Recent</option>
-                  <option value="2">Hot</option>
-                  <option value="3">Top</option>
+                  <option value="1">Anime</option>
+                  <option value="2">Manga</option>
+                  <option value="3">Characters</option>
                 </select>
               </div>
             </div>
-            <div class="input-group mt-3 mb-3 bg-light">
+            <button class="btn btn-primary" type="button">Add</button>
+            <div class="input-group pt-3 pb-3 bg-light">
               <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button">Search</button>
@@ -40,3 +38,4 @@ export default function Activity() {
     </div>
   )
 }
+
