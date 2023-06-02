@@ -9,5 +9,9 @@ Rails.application.routes.draw do
   get "/tierlist/:id" => "static_pages#tier_list"
   get "/user/:id" => "static_pages#user"
   get "/user/me" => "static_pages#user"
-  
+
+  namespace :api do
+    resources :users
+  end
+
 end
