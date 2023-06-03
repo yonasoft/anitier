@@ -24,10 +24,10 @@ export default function Activity() {
                 </select>
               </div>
             </div>
-            <div class="input-group mt-3 mb-3 bg-light">
-              <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button">Search</button>
+            <div className="input-group mt-3 mb-3 bg-light">
+              <input type="text" className="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
+              <div className="input-group-append">
+                <button className="btn btn-outline-secondary" type="button">Search</button>
               </div>
             </div>
           </div>

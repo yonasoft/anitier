@@ -15,11 +15,10 @@ export default function SignUpWidget({ setRequireSignup }) {
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
 
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     function handleSignup(e) {
         e.preventDefault();
-
-        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
 
         if (username === "" || email === "" || password === "" || confirmPassword === "") {
             setError("All fields must be filled");
@@ -56,8 +55,7 @@ export default function SignUpWidget({ setRequireSignup }) {
             body: JSON.stringify({ user: { username: username, email: email, password: password } })
         }).then(response => {
             if (response.ok) {
-                login();
-                return response.json();
+                return login().then(() => response.json());
             } else {
                 // If the email or username is not unique, Rails should return a 422 Unprocessable Entity status
                 if (response.status === 422) {
@@ -74,7 +72,6 @@ export default function SignUpWidget({ setRequireSignup }) {
         }).catch(error => console.error('Error:', error));
     }
 
-
     const login = () => {
         fetch('/api/login', {
             method: 'POST',
@@ -84,10 +81,13 @@ export default function SignUpWidget({ setRequireSignup }) {
             },
             body: JSON.stringify({ username: username, password: password })
         }).then(response => {
-            if (!response.ok) throw new Error('Failed to login');
-        }).catch(error => {
-            setError("Failed to automatically login, please try logging in manually");
-            console.error('Error:', error);
+            if (response.ok) {
+                window.location.href = '/home'; // Redirect to home page
+            } else {
+                response.json().then(data => {
+                    setError(data.error); // Show error message
+                });
+            }
         });
     };
 

@@ -12,7 +12,8 @@ export default function NavBar() {
     fetch("/api/authenticate", {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': token
       },
     })
       .then((response) => response.json())
