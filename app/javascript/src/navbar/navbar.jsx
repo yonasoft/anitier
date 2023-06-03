@@ -8,7 +8,7 @@ export default function NavBar() {
 
   const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  useEffect(() => {
+  const fetchUserState = () => {
     fetch("/api/authenticate", {
       headers: {
         'Accept': 'application/json',
@@ -20,7 +20,14 @@ export default function NavBar() {
       .then((data) => {
         setLoggedIn(data.logged_in);
         setUsername(data.username); // assuming the server returns username
+      })
+      .catch((error) => {
+        console.error('Error:', error);
       });
+  }
+
+  useEffect(() => {
+    fetchUserState();
   }, []);
 
   const logout = () => {
@@ -37,9 +44,11 @@ export default function NavBar() {
           setLoggedIn(false);
           setUsername("");
         }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
       });
   }
-
 
   return (
     <nav className="navbar navbar-expand shadow p-3">

@@ -52,7 +52,8 @@ export default function SignUpWidget({ setRequireSignup }) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': token
             },
-            body: JSON.stringify({ user: { username: username, email: email, password: password } })
+            body: JSON.stringify({ user: { username: username, email: email, password: password } }),
+            credentials: 'include'
         }).then(response => {
             if (response.ok) {
                 return login().then(() => response.json());
@@ -73,13 +74,14 @@ export default function SignUpWidget({ setRequireSignup }) {
     }
 
     const login = () => {
-        fetch('/api/login', {
+        return fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': token
             },
-            body: JSON.stringify({ username: username, password: password })
+            body: JSON.stringify({ username: username, password: password }),
+            credentials: 'include'
         }).then(response => {
             if (response.ok) {
                 window.location.href = '/home'; // Redirect to home page
@@ -90,6 +92,7 @@ export default function SignUpWidget({ setRequireSignup }) {
             }
         });
     };
+
 
     return (
         <div id="signup-widget" className="border rounded bg-light shadow-lg d-flex flex-column align-items-center">

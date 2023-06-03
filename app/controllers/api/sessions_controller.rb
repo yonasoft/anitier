@@ -15,16 +15,22 @@ module Api
     end
 
     def destroy
-      reset_session
+      if logged_in?
+        log_out
+        render json: { logged_in: false }
+      end
+    end
+
+    def log_out
+      session.delete(:user_id)
       @current_user = nil
-      render json: { logged_in: false }
     end
 
     def authenticate
       if logged_in?
         render json: { logged_in: true, user_id: current_user.id, username: current_user.username }
       else
-       render json: { logged_in: false }, status: :unauthorized
+        render json: { logged_in: false }, status: :unauthorized
       end
     end
   end

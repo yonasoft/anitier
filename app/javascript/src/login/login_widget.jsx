@@ -8,7 +8,7 @@ export default function LoginWidget({ setRequireSignup }) {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState(null); // For displaying error messages
+    const [error, setError] = useState(null);
 
     const handleUsernameChange = (event) => {
         setUsername(event.target.value);
@@ -18,6 +18,7 @@ export default function LoginWidget({ setRequireSignup }) {
         setPassword(event.target.value);
     };
 
+
     const handleLogin = () => { // Add this method
         fetch('/api/login', {
             method: 'POST',
@@ -25,7 +26,7 @@ export default function LoginWidget({ setRequireSignup }) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': token
             },
-            body: JSON.stringify({ username: username, password: password })
+            body: JSON.stringify({ username: username, password: password, remember_me: rememberMe })
         }).then(response => {
             if (response.ok) {
                 window.location.href = '/home'; // Redirect to home page
@@ -48,10 +49,6 @@ export default function LoginWidget({ setRequireSignup }) {
             <div className="form-floating mb-3">
                 <input type="password" className="form-control form-control-lg" id="password" value={password} onChange={handlePasswordChange} />
                 <label htmlFor="password">Password</label>
-            </div>
-            <div className="form-check">
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                <label className="form-check-label text-start" htmlFor="flexCheckDefault">Remember me</label>
             </div>
             <button id="login-btn" className="btn btn-primary btn-block mb-0 text-light font-weight-bold mt-3 mb-3" onClick={handleLogin}>Login</button>
 
