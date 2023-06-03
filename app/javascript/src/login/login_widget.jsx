@@ -18,7 +18,6 @@ export default function LoginWidget({ setRequireSignup }) {
         setPassword(event.target.value);
     };
 
-
     const handleLogin = () => { // Add this method
         fetch('/api/login', {
             method: 'POST',
@@ -26,7 +25,7 @@ export default function LoginWidget({ setRequireSignup }) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': token
             },
-            body: JSON.stringify({ username: username, password: password, remember_me: rememberMe })
+            body: JSON.stringify({ username: username, password: password})
         }).then(response => {
             if (response.ok) {
                 window.location.href = '/home'; // Redirect to home page
