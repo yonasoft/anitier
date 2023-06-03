@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+
+    has_many :tier_lists
+
     before_save { self.email = email.downcase if email.present? }
     before_save { self.username = username.downcase if username.present? }
 

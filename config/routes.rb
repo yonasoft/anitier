@@ -11,12 +11,11 @@ Rails.application.routes.draw do
   get "/user/me" => "static_pages#user"
 
   namespace :api do
-    resources :users
-    
-    get "/login", to: "sessions#new"
-    post "/login", to: "sessions#create"
-    delete "/logout", to: "sessions#destroy"
-    get "/authenticate", to: "sessions#authenticate"
+    resources :tier_lists do
+      resources :tiers
+      resources :inventories
+    end
+    resources :template_tier_lists
+    resources :contents
   end
-
 end
