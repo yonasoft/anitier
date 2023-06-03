@@ -5,8 +5,6 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 export default function SignUpWidget({ setRequireSignup }) {
-    
-
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -18,8 +16,11 @@ export default function SignUpWidget({ setRequireSignup }) {
     const handleShow = () => setShowModal(true);
 
     function handleSignup(e) {
+        e.preventDefault();
+
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        e.preventDefault();  
+
+
         if (username === "" || email === "" || password === "" || confirmPassword === "") {
             setError("All fields must be filled");
             return;
@@ -52,9 +53,10 @@ export default function SignUpWidget({ setRequireSignup }) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': token
             },
-            body: JSON.stringify({ user: { name: username, email: email, password: password } })
+            body: JSON.stringify({ user: { username: username, email: email, password: password } })
         }).then(response => {
             if (response.ok) {
+                login();
                 return response.json();
             } else {
                 // If the email or username is not unique, Rails should return a 422 Unprocessable Entity status
@@ -71,6 +73,23 @@ export default function SignUpWidget({ setRequireSignup }) {
             }, 3000);
         }).catch(error => console.error('Error:', error));
     }
+
+
+    const login = () => {
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': token
+            },
+            body: JSON.stringify({ username: username, password: password })
+        }).then(response => {
+            if (!response.ok) throw new Error('Failed to login');
+        }).catch(error => {
+            setError("Failed to automatically login, please try logging in manually");
+            console.error('Error:', error);
+        });
+    };
 
     return (
         <div id="signup-widget" className="border rounded bg-light shadow-lg d-flex flex-column align-items-center">

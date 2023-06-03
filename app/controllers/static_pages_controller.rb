@@ -1,5 +1,10 @@
 class StaticPagesController < ApplicationController
-    def hello_world  
+    def welcome
+        if logged_in?
+            redirect_to "/home"
+        else
+            render "login"
+        end 
     end
 
     def login
