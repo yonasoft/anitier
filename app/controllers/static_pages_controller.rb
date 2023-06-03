@@ -22,4 +22,10 @@ class StaticPagesController < ApplicationController
 
     def templates
     end
+
+      def template_tier_list  # NEW METHOD
+  end
+
+  def user
+  end
 end

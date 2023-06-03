@@ -20,7 +20,7 @@ export default function Activity() {
                 <select defaultValue="1" className="form-select form-select-lg" aria-label=" example">
                   <option value="1">Recent</option>
                   <option value="2">Hot</option>
-                  <option value="3">Top</option>
+                  <option value="3">Popular</option>
                 </select>
               </div>
             </div>

@@ -9,6 +9,12 @@ class TierList < ApplicationRecord
 
   after_create :create_default_tiers
 
+  validates :upvotes, numericality: { greater_than_or_equal_to: 0 }
+  validates :downvotes, numericality: { greater_than_or_equal_to: 0 }
+  scope :recent, -> { order(created_at: :desc) }
+  scope :popular, -> { order('(upvotes - downvotes) DESC') }
+  scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }
+
   private
 
   def create_default_tiers

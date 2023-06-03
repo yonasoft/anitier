@@ -38,6 +38,21 @@ module Api
       @tier_list.destroy
     end
 
+    def recent
+      @tier_lists = TierList.recent
+      render json: @tier_lists
+    end
+
+    def popular
+      @tier_lists = TierList.popular
+      render json: @tier_lists
+    end
+
+    def hot
+      @tier_lists = TierList.hot
+      render json: @tier_lists
+    end
+
     private
       def set_tier_list
         @tier_list = TierList.find(params[:id])
