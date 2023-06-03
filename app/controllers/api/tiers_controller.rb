@@ -2,18 +2,15 @@ module Api
   class TiersController < ApplicationController
     before_action :set_tier, only: [:show, :update, :destroy]
 
-    # GET /tiers
     def index
       @tiers = Tier.all
       render json: @tiers
     end
 
-    # GET /tiers/1
     def show
       render json: @tier
     end
 
-    # POST /tiers
     def create
       @tier = Tier.new(tier_params)
 
@@ -24,7 +21,6 @@ module Api
       end
     end
 
-    # PATCH/PUT /tiers/1
     def update
       if @tier.update(tier_params)
         render json: @tier
@@ -33,7 +29,6 @@ module Api
       end
     end
 
-    # DELETE /tiers/1
     def destroy
       @tier.destroy
     end

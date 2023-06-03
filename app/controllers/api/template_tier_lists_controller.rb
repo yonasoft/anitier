@@ -2,18 +2,15 @@ module Api
   class TemplateTierListsController < ApplicationController
     before_action :set_template_tier_list, only: [:show, :update, :destroy]
 
-    # GET /template_tier_lists
     def index
       @template_tier_lists = TemplateTierList.all
       render json: @template_tier_lists
     end
 
-    # GET /template_tier_lists/1
     def show
       render json: @template_tier_list
     end
 
-    # POST /template_tier_lists
     def create
       @template_tier_list = TemplateTierList.new(template_tier_list_params)
 
@@ -24,7 +21,6 @@ module Api
       end
     end
 
-    # PATCH/PUT /template_tier_lists/1
     def update
       if @template_tier_list.update(template_tier_list_params)
         render json: @template_tier_list
@@ -33,7 +29,6 @@ module Api
       end
     end
 
-    # DELETE /template_tier_lists/1
     def destroy
       @template_tier_list.destroy
     end
