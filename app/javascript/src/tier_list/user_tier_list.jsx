@@ -3,10 +3,7 @@ import React, { useState } from 'react';
 import './tier_list.scss';
 import NavBar from '../navbar/navbar'
 
-
-
 export default function UserTierList() {
-
 
     return (
         <React.Fragment>

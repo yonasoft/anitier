@@ -3,6 +3,7 @@ import './login.scss';
 
 
 export default function LoginWidget({ setRequireSignup }) {
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     const [username, setUsername] = useState("");
@@ -41,7 +42,7 @@ export default function LoginWidget({ setRequireSignup }) {
             <h2 className="h2 mb-3 mt-2 fw-bold">Login</h2>
             <div className="form-floating mb-3">
                 <input type="text" className="form-control form-control-lg" id="username" value={username} onChange={handleUsernameChange} />
-                <label htmlFor="username">Username</label>
+                <label htmlFor="username">Username or E-mail</label>
             </div>
             <div className="form-floating mb-3">
                 <input type="password" className="form-control form-control-lg" id="password" value={password} onChange={handlePasswordChange} />
