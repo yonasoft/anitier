@@ -21,11 +21,11 @@ export default function Templates() {
                 </select>
               </div>
             </div>
-            <button class="btn btn-primary" type="button">Add</button>
-            <div class="input-group pt-3 pb-3 bg-light">
-              <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button">Search</button>
+            <button className="btn btn-primary" type="button">Add</button>
+            <div className="input-group pt-3 pb-3 bg-light">
+              <input type="text" className="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
+              <div className="input-group-append">
+                <button className="btn btn-outline-secondary" type="button">Search</button>
               </div>
             </div>
           </div>
