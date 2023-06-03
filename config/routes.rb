@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       get 'hot', on: :collection
       resources :tiers
       resources :inventories
+      get 'user/:user_id', to: 'tier_lists#user_lists', on: :collection
     end
     resources :template_tier_lists
     resources :tiers

@@ -53,6 +53,12 @@ module Api
       render json: @tier_lists
     end
 
+    def user_lists
+      @user = User.find(params[:user_id])
+      @tier_lists = @user.tier_lists
+      render json: @tier_lists
+    end
+
     private
       def set_tier_list
         @tier_list = TierList.find(params[:id])
