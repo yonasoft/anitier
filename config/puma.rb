@@ -8,7 +8,6 @@ max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
 threads min_threads_count, max_threads_count
 
-workers Integer(ENV.fetch('WEB_CONCURRENCY') || 2)
 
 # Specifies the `worker_timeout` threshold that Puma will use to wait before
 # terminating a worker in development environments.
@@ -39,7 +38,7 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # before forking the application. This takes advantage of Copy On Write
 # process behavior so workers use less memory.
 #
-preload_app!
+# preload_app!
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart

@@ -11,8 +11,8 @@ export default function Activity() {
   return (
     <div id="root">
       <NavBar />
-      <div className="container">
-        <div className="row">
+      <div className="container ">
+        <div className="row ">
           <div className="col-12 bg-light py-2">
             <div className="d-flex">
               <h1 className="me-auto">Activity</h1>
