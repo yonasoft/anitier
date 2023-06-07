@@ -4,4 +4,5 @@ class Tier < ApplicationRecord
   has_many :contents, dependent: :destroy
 
   validates :rank, presence: true
+  validates :tier_list_id, presence: true
 end

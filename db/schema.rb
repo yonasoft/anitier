@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_03_212625) do
+ActiveRecord::Schema.define(version: 2023_06_05_221129) do
 
   create_table "contents", force: :cascade do |t|
     t.integer "api_id"
@@ -42,15 +42,16 @@ ActiveRecord::Schema.define(version: 2023_06_03_212625) do
   end
 
   create_table "tier_lists", force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.integer "source"
-    t.integer "content_type"
+    t.string "title", default: ""
+    t.text "description", default: ""
+    t.integer "source", default: 0
+    t.integer "content_type", default: 0
     t.integer "user_id", null: false
-    t.integer "upvotes"
-    t.integer "downvotes"
+    t.integer "upvotes", default: 0
+    t.integer "downvotes", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "posted"
     t.index ["user_id"], name: "index_tier_lists_on_user_id"
   end
 

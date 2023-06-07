@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
+import { fetchUserState, logoutUser } from '../../utils/fetch';
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -8,46 +9,23 @@ export default function NavBar() {
 
   const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  const fetchUserState = () => {
-    fetch("/api/authenticate", {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setLoggedIn(data.logged_in);
-        setUsername(data.username); // assuming the server returns username
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  }
-
   useEffect(() => {
-    fetchUserState();
+    fetchUserState().then(userState => {
+      setLoggedIn(userState.logged_in);
+      if (userState.logged_in) {
+        setUsername(userState.username);
+      }
+    }).catch(error => console.error(error));
   }, []);
 
-  const logout = () => {
-    fetch("/api/logout", {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setLoggedIn(false);
-          setUsername("");
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+  const logout = async () => {
+    try {
+      await logoutUser(token);
+      setLoggedIn(false);
+      setUsername("");
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
 
   return (

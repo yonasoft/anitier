@@ -8,24 +8,28 @@ module Api
     end
 
     def show
-      render json: @tier_list
+      tier_list = TierList.find(params[:id])
+      render json: tier_list.as_json(include: :tiers)
     end
 
     def create
-      @tier_list = TierList.new(tier_list_params)
+      tier_list = TierList.new(tier_list_params)
 
-      if @tier_list.save
-        render json: @tier_list, status: :created
+      if tier_list.save
+        render json: { tier_list: tier_list }, status: :created
       else
-        render json: @tier_list.errors, status: :unprocessable_entity
+        Rails.logger.error("TierList validation failed: #{tier_list.errors.full_messages}")
+        render json: { error: tier_list.errors }, status: :unprocessable_entity
       end
     end
 
     def update
+      @tier_list = TierList.find(params[:id])
+    
       if @tier_list.update(tier_list_params)
-        render json: @tier_list
+        render json: @tier_list.as_json(include: :tiers)
       else
-        render json: @tier_list.errors, status: :unprocessable_entity
+        render json: { errors: @tier_list.errors }, status: :unprocessable_entity
       end
     end
 
@@ -55,12 +59,12 @@ module Api
     end
 
     private
-      def set_tier_list
-        @tier_list = TierList.find(params[:id])
-      end
+    def set_tier_list
+      @tier_list = TierList.find(params[:id])
+    end
 
-      def tier_list_params
-        params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id)
-      end
+    def tier_list_params
+      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes)
+    end
   end
 end
