@@ -22,6 +22,8 @@
     "webpack-dev-server": "^3"
   },
   "dependencies": {
+    "@mateoaranda/jikanjs": "^1.2.4",
+    "anilist-node": "^1.14.0",
     "react-bootstrap": "^2.7.4"
   }
 }

@@ -38,17 +38,17 @@ module Api
     end
 
     def recent
-      @tier_lists = TierList.recent
+      @tier_lists = TierList.posted.recent
       render json: @tier_lists
     end
 
     def popular
-      @tier_lists = TierList.popular
+      @tier_lists = TierList.posted.popular
       render json: @tier_lists
     end
 
     def hot
-      @tier_lists = TierList.hot
+      @tier_lists = TierList.posted.hot
       render json: @tier_lists
     end
 
@@ -58,13 +58,27 @@ module Api
       render json: @tier_lists
     end
 
+    def posted_user_lists
+      @user = User.find(params[:user_id])
+      @tier_lists = @user.tier_lists.posted
+      render json: @tier_lists
+    end
+
+    def unposted_user_lists
+      @user = User.find(params[:user_id])
+      @tier_lists = @user.tier_lists.unposted
+      render json: @tier_lists
+    end
+
+
     private
     def set_tier_list
       @tier_list = TierList.find(params[:id])
     end
 
+
     def tier_list_params
-      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes)
+      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes, :posted)
     end
   end
 end

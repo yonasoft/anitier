@@ -65,19 +65,19 @@ export default function CreateSetup({ nextStep }) {
     const saveTierList = async () => {
         try {
             const tierListResponse = await postTierList(tierList);
-            const tierListId = tierListResponse.tier_list.id;
+            console.log('tierListResponse:', tierListResponse);
+
+            const tierListId = tierListResponse.tier_list.id;  // Extracting the tierListId from the response
 
             for (const tier of tiers) {
                 const tierResponse = await postTier(tier, tierListId);
                 console.log(tierResponse);
             }
-
-            const inventoryResponse = await postInventory({ contents: [] }, tierListId);
-
-            // Update the tier list with the new inventory id
+            const inventoryResponse = await postInventory(tierListId);
+            console.log('inventoryResponse:', inventoryResponse);
             const updatedTierList = {
                 ...tierList,
-                inventory_id: inventoryResponse.inventory.id,
+                inventory_id: inventoryResponse.id,
             }
 
             const updatedTierListResponse = await updateTierList(tierListId, updatedTierList);

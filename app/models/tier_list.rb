@@ -10,6 +10,9 @@ class TierList < ApplicationRecord
   validates :downvotes, numericality: { greater_than_or_equal_to: 0 }
   validates :source, presence: true
   validates :content_type, presence: true
+
+  scope :posted, -> { where(posted: true) }
+  scope :unposted, -> { where(posted: false) }
   scope :recent, -> { order(created_at: :desc) }
   scope :popular, -> { order('(upvotes - downvotes) DESC') }
   scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }

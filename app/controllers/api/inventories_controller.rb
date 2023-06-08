@@ -1,56 +1,34 @@
 module Api
   class InventoriesController < ApplicationController
-    before_action :set_inventory, only: [:show, :update, :destroy]
 
     def index
-      if params[:tier_list_id]
-        @tier_list = TierList.find_by(id: params[:tier_list_id])
-        @inventory = @tier_list ? @tier_list.inventory : nil
-      else
-        @inventories = Inventory.all
-      end
-
-      if @inventory
-        render json: @inventory
-      else
-        render json: @inventories
-      end
-    end
-
-    def show
-      render json: @inventory
+      @inventories = Inventory.where(tier_list_id: params[:tier_list_id])
+      render json: @inventories
     end
 
     def create
-      @inventory = Inventory.new(inventory_params)
+      @inventory = Inventory.new(inventory_params.except(:content_ids))
 
       if @inventory.save
-        render json: { inventory: @inventory }, status: :created  # Updated line
+        @inventory.contents << Content.where(id: inventory_params[:content_ids])
+        render json: @inventory, status: :created
       else
         render json: @inventory.errors, status: :unprocessable_entity
       end
     end
-
 
     def update
-      if @inventory.update(inventory_params)
-        render json: @inventory
+      if @tier.update(tier_params.except(:content_ids))
+        @tier.contents.replace(Content.where(id: tier_params[:content_ids]))
+        render json: @tier
       else
-        render json: @inventory.errors, status: :unprocessable_entity
+        render json: @tier.errors, status: :unprocessable_entity
       end
-    end
-
-    def destroy
-      @inventory.destroy
     end
 
     private
-      def set_inventory
-        @inventory = Inventory.find(params[:id])
-      end
-
     def inventory_params
-      params.require(:inventory).permit(:tier_list_id, contents: [])
+      params.require(:inventory).permit(:tier_list_id, content_ids: [])
     end
   end
 end

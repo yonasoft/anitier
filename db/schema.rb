@@ -10,15 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_05_221129) do
+ActiveRecord::Schema.define(version: 2023_06_07_190314) do
 
   create_table "contents", force: :cascade do |t|
     t.integer "api_id"
-    t.integer "tier_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position"
+    t.string "contentable_type"
+    t.integer "contentable_id"
+    t.integer "inventory_id"
+    t.integer "tier_id"
+    t.index ["contentable_type", "contentable_id"], name: "index_contents_on_contentable"
+    t.index ["inventory_id"], name: "index_contents_on_inventory_id"
     t.index ["tier_id"], name: "index_contents_on_tier_id"
+  end
+
+  create_table "contents_inventories", id: false, force: :cascade do |t|
+    t.integer "content_id", null: false
+    t.integer "inventory_id", null: false
+    t.index ["content_id", "inventory_id"], name: "index_contents_inventories_on_content_id_and_inventory_id"
+  end
+
+  create_table "contents_tiers", id: false, force: :cascade do |t|
+    t.integer "content_id", null: false
+    t.integer "tier_id", null: false
+    t.index ["content_id", "tier_id"], name: "index_contents_tiers_on_content_id_and_tier_id"
   end
 
   create_table "inventories", force: :cascade do |t|
@@ -72,6 +89,7 @@ ActiveRecord::Schema.define(version: 2023_06_05_221129) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "contents", "inventories"
   add_foreign_key "contents", "tiers"
   add_foreign_key "inventories", "tier_lists"
   add_foreign_key "template_tier_lists", "users"

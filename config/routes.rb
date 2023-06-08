@@ -22,12 +22,15 @@ Rails.application.routes.draw do
     end
     resources :template_tier_lists
     resources :tiers
-    resources :inventories
+    resources :inventories, only: [:index]
     resources :contents
     
     get "/login", to: "sessions#new"
     post "/login", to: "sessions#create"
     delete "/logout", to: "sessions#destroy"
     get "/authenticate", to: "sessions#authenticate"
+    get 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', on: :collection
+    get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', on: :collection
   end
 end
+

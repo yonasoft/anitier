@@ -22,7 +22,10 @@ module Api
     end
 
     def update
-      if @tier.update(tier_params)
+      @tier = Tier.find(params[:id])
+
+      if @tier.update(tier_params.except(:content_ids))
+        @tier.contents = Content.where(id: tier_params[:content_ids])
         render json: @tier
       else
         render json: @tier.errors, status: :unprocessable_entity
