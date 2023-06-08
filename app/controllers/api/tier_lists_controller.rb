@@ -53,23 +53,22 @@ module Api
     end
 
     def user_lists
-      @user = User.find(params[:user_id])
+      @user = User.find(params[:id]) 
       @tier_lists = @user.tier_lists
       render json: @tier_lists
     end
 
     def posted_user_lists
-      @user = User.find(params[:user_id])
+      @user = User.find(params[:id]) 
       @tier_lists = @user.tier_lists.posted
       render json: @tier_lists
     end
 
     def unposted_user_lists
-      @user = User.find(params[:user_id])
+      @user = User.find(params[:id]) 
       @tier_lists = @user.tier_lists.unposted
       render json: @tier_lists
     end
-
 
     private
     def set_tier_list

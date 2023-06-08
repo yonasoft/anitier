@@ -13,24 +13,32 @@ Rails.application.routes.draw do
   namespace :api do
     resources :users
     resources :tier_lists do
-      get 'recent', on: :collection
-      get 'popular', on: :collection
-      get 'hot', on: :collection
+      collection do
+        get 'recent'
+        get 'popular'
+        get 'hot'
+      end
+      member do
+        get 'user/:user_id', to: 'tier_lists#user_lists'
+        get 'user/:user_id/posted', to: 'tier_lists#posted_user_lists'
+        get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists'
+      end
       resources :tiers
       resources :inventories
-      get 'user/:user_id', to: 'tier_lists#user_lists', on: :collection
     end
+
+    match 'user/:user_id', to: 'tier_lists#user_lists', via: :get
+    match 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', via: :get
+    match 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', via: :get
+
     resources :template_tier_lists
     resources :tiers
     resources :inventories, only: [:index]
     resources :contents
-    
+  
     get "/login", to: "sessions#new"
     post "/login", to: "sessions#create"
     delete "/logout", to: "sessions#destroy"
     get "/authenticate", to: "sessions#authenticate"
-    get 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', on: :collection
-    get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', on: :collection
   end
 end
-
