@@ -204,18 +204,18 @@ export async function updateTier(tierId, contentApiIds = []) {
 }
 
 export async function postInventory(tierListId, contentIds = []) {
-    const response = await fetch('/api/inventories', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
+    const response = await fetch("/api/inventories", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
+      },
+      body: JSON.stringify({
+        inventory: {
+          tier_list_id: tierListId,
+          content_ids: Array.isArray(contentIds) ? contentIds : [contentIds],
         },
-        body: JSON.stringify({
-            inventory: {
-                tier_list_id: tierListId,
-                content_ids: Array.isArray(contentIds) ? contentIds : [contentIds]
-            }
-        })
+      }),
     });
 
     if (!response.ok) {

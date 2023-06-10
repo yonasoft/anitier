@@ -10,8 +10,8 @@ class TemplateTierList < ApplicationRecord
   private
 
   def create_default_tiers
-    %w[S A B C D].each do |rank|
-      self.tiers.create!(rank: rank)
+    %w(S A B C D).each do |rank|
+      tiers.create!(rank: rank)
     end
   end
 end
