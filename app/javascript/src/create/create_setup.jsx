@@ -73,15 +73,6 @@ export default function CreateSetup({ nextStep }) {
                 const tierResponse = await postTier(tier, tierListId);
                 console.log(tierResponse);
             }
-            const inventoryResponse = await postInventory(tierListId);
-            console.log('inventoryResponse:', inventoryResponse);
-            const updatedTierList = {
-                ...tierList,
-                inventory_id: inventoryResponse.id,
-            }
-
-            const updatedTierListResponse = await updateTierList(tierListId, updatedTierList);
-            console.log(updatedTierListResponse);
 
             nextStep(tierListId);
         } catch (error) {

@@ -9,7 +9,7 @@ module Api
 
     def show
       tier_list = TierList.find(params[:id])
-      render json: tier_list.as_json(include: :tiers)
+      render json: tier_list.as_json(include: [:tiers, :inventory])
     end
 
     def inventories
@@ -22,22 +22,24 @@ module Api
       tier_list = TierList.new(tier_list_params)
 
       if tier_list.save!
-        render json: { tier_list: }, status: :created
+        render json: { tier_list: tier_list, inventory: tier_list.inventory }, status: :created
       else
         Rails.logger.error("TierList validation failed: #{tier_list.errors.full_messages}")
         render json: { error: tier_list.errors }, status: :unprocessable_entity
       end
     end
 
+
     def update
       @tier_list = TierList.find(params[:id])
 
       if @tier_list.update(tier_list_params)
-        render json: @tier_list.as_json(include: :tiers)
+        render json: @tier_list.as_json(include: :inventory)
       else
         render json: { errors: @tier_list.errors }, status: :unprocessable_entity
       end
     end
+
 
     def destroy
       @tier_list.destroy
@@ -83,8 +85,12 @@ module Api
     end
 
     def tier_list_params
-      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes,
-                                        :posted)
+      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes, :posted)
+    end
+    def inventory
+      tier_list = TierList.find(params[:id])
+      @inventory = tier_list.inventory
+      render json: @inventory
     end
   end
 end

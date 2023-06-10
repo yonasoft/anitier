@@ -1,6 +1,9 @@
 class TierList < ApplicationRecord
+
+  after_create :create_inventory
+
   belongs_to :user, optional: true
-  has_many :inventories, dependent: :destroy
+  has_one :inventory, dependent: :destroy
   has_many :tiers, dependent: :destroy
 
   enum source: { anilist: 0, mal: 1 }
@@ -16,4 +19,8 @@ class TierList < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :popular, -> { order('(upvotes - downvotes) DESC') }
   scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }
+
+  def create_inventory
+    self.create_inventory!
+  end  
 end

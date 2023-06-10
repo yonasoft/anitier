@@ -154,7 +154,6 @@ export async function postTier(tier, tierListId, contentIds = []) {
     return await response.json();
 }
 
-
 export async function createContent(contentData) {
     const response = await fetch('/api/contents', {
         method: 'POST',
@@ -203,30 +202,8 @@ export async function updateTier(tierId, contentApiIds = []) {
     return await response.json();
 }
 
-export async function postInventory(tierListId, contentIds = []) {
-    const response = await fetch("/api/inventories", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": token,
-      },
-      body: JSON.stringify({
-        inventory: {
-          tier_list_id: tierListId,
-          content_ids: Array.isArray(contentIds) ? contentIds : [contentIds],
-        },
-      }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-}
-
 export async function fetchInventory(tierListId) {
-    const response = await fetch(`/api/tier_lists/${tierListId}/inventories`, {
+    const response = await fetch(`/api/tier_lists/${tierListId}/inventory`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -244,7 +221,11 @@ export async function fetchInventory(tierListId) {
 }
 
 async function updateInventory(tierListId, contentIds = []) {
-    const response = await fetch(`/api/inventories/${tierListId}`, {
+    // Get the inventoryId from the tierList first
+    const inventoryData = await fetchInventory(tierListId);
+    const inventoryId = inventoryData.id;
+
+    const response = await fetch(`/api/inventories/${inventoryId}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
