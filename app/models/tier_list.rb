@@ -1,5 +1,4 @@
 class TierList < ApplicationRecord
-
   after_create :create_inventory
 
   belongs_to :user, optional: true
@@ -21,6 +20,6 @@ class TierList < ApplicationRecord
   scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }
 
   def create_inventory
-    self.create_inventory!
-  end  
+    create_inventory!
+  end
 end

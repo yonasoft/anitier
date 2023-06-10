@@ -31,7 +31,7 @@ module Api
         render json: { logged_in: true, user_id: current_user.id, username: current_user.username }
       else
         render json: { logged_in: false, message: "User is not logged in." }, status: :unauthorized
-        end
+      end
     rescue => e
       render json: { logged_in: false, message: "Error: #{e.message}" }, status: :unauthorized
     end

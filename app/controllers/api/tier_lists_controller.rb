@@ -29,7 +29,6 @@ module Api
       end
     end
 
-
     def update
       @tier_list = TierList.find(params[:id])
 
@@ -39,7 +38,6 @@ module Api
         render json: { errors: @tier_list.errors }, status: :unprocessable_entity
       end
     end
-
 
     def destroy
       @tier_list.destroy
@@ -87,6 +85,7 @@ module Api
     def tier_list_params
       params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes, :posted)
     end
+
     def inventory
       tier_list = TierList.find(params[:id])
       @inventory = tier_list.inventory

@@ -11,7 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2023_06_07_190314) do
-
   create_table "contents", force: :cascade do |t|
     t.integer "api_id"
     t.datetime "created_at", precision: 6, null: false

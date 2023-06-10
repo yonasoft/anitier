@@ -43,7 +43,7 @@ module Api
       @tier = Tier.find(params[:id])
     end
 
-    def tier_params   
+    def tier_params
       params.require(:tier).permit(:rank, :tier_list_id, content_ids: [])
     end
   end
