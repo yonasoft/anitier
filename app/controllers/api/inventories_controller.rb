@@ -1,11 +1,5 @@
 module Api
   class InventoriesController < ApplicationController
-
-    def index
-      @inventories = Inventory.where(tier_list_id: params[:tier_list_id])
-      render json: @inventories
-    end
-
     def create
       @inventory = Inventory.new(inventory_params.except(:content_ids))
 
@@ -27,6 +21,7 @@ module Api
     end
 
     private
+
     def inventory_params
       params.require(:inventory).permit(:tier_list_id, content_ids: [])
     end

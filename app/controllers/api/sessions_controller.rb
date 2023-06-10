@@ -32,7 +32,7 @@ module Api
       else
         render json: { logged_in: false, message: "User is not logged in." }, status: :unauthorized
         end
-      rescue => e
+    rescue => e
       render json: { logged_in: false, message: "Error: #{e.message}" }, status: :unauthorized
     end
   end

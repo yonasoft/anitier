@@ -37,12 +37,13 @@ module Api
     end
 
     private
-      def set_tier
-        @tier = Tier.find(params[:id])
-      end
 
-      def tier_params
-        params.require(:tier).permit(:rank, :tier_list_id)
-      end
+    def set_tier
+      @tier = Tier.find(params[:id])
+    end
+
+    def tier_params
+      params.require(:tier).permit(:rank, :tier_list_id)
+    end
   end
 end

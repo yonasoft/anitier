@@ -24,21 +24,22 @@ module Api
     end
 
     private
+
     def update_relationships
       @content.inventories.clear
       @content.tiers.clear
-      
+
       if content_params[:inventory_ids].present?
         inventories = Inventory.where(id: content_params[:inventory_ids])
         @content.inventories << inventories
       end
-      
+
       if content_params[:tier_ids].present?
         tiers = Tier.where(id: content_params[:tier_ids])
         @content.tiers << tiers
       end
     end
-    
+
     def content_params
       params.require(:content).permit(:api_id, :content_type, :source, inventory_ids: [], tier_ids: [])
     end
@@ -68,6 +69,7 @@ module Api
     end
 
     private
+
     def inventory_params
       params.require(:inventory).permit(:tier_list_id, content_ids: [])
     end

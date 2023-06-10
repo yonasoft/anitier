@@ -34,12 +34,13 @@ module Api
     end
 
     private
-      def set_template_tier_list
-        @template_tier_list = TemplateTierList.find(params[:id])
-      end
 
-      def template_tier_list_params
-        params.require(:template_tier_list).permit(:title, :description, :source, :content_type, :user_id)
-      end
+    def set_template_tier_list
+      @template_tier_list = TemplateTierList.find(params[:id])
+    end
+
+    def template_tier_list_params
+      params.require(:template_tier_list).permit(:title, :description, :source, :content_type, :user_id)
+    end
   end
 end
