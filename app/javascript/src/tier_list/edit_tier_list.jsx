@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './create.scss';
 import NavBar from '../navbar/navbar'
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { fetchTierList, fetchInventory } from '../../utils/fetch';
