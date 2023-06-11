@@ -3,3 +3,12 @@
     min-height: 100%;
     height: auto;
 }
+
+.result-item {
+    font-size: 0.8rem;
+}
+
+.scrollable-results {
+    max-height: 200px;
+    overflow-y: auto;
+}

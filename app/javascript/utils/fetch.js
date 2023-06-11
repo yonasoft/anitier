@@ -247,6 +247,7 @@ async function updateInventory(tierListId, contentIds = []) {
     return responseData;
 }
 
+
 export async function fetchUserTierLists(userId) {
     const response = await fetch(`/api/tier_lists/user/${userId}`, {
         method: 'GET',

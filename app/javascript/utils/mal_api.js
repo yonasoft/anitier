@@ -1,37 +1,16 @@
 import jikanjs from 'jikanjs';
+import { ContentType } from '../utils/constants';
 
 const clientID = process.env.MAL_CLIENT_ID;
 
-const ContentType = {
-    0: 'anime',
-    1: 'manga',
-    2: 'character',
-};
-
-
-const AnimeStatus = {
-    0: "watching",
-    1: "completed",
-    2: "on_hold",
-    3: "dropped",
-    4: "plan_to_watch"
-}
-
-const MangaStatus = {
-    0: "reading",
-    1: "completed",
-    2: "on_hold",
-    3: "dropped",
-    4: "plan_to_read"
-}
 
 export async function searchMALContent(contentType, query) {
     switch (contentType) {
-        case 0:
+        case ContentType.anime:
             return await searchAnime(query);
-        case 1:
+        case ContentType.manga:
             return await searchManga(query);
-        case 2:
+        case ContentType.character:
             return await searchCharacters(query);
         default:
             console.error("Invalid content type provided");
@@ -41,11 +20,11 @@ export async function searchMALContent(contentType, query) {
 
 export async function fetchMALContent(contentType, id) {
     switch (contentType) {
-        case 0:
+        case ContentType.anime:
             return await fetchAnime(id);
-        case 1:
+        case ContentType.manga:
             return await fetchManga(id);
-        case 2:
+        case ContentType.character:
             return await fetchCharacter(id);
         default:
             console.error("Invalid content type provided");
@@ -86,8 +65,9 @@ export async function searchCharacters(query) {
 
 export async function fetchAnime(id) {
     try {
-        const animeData = await jikanjs.loadAnime(id);
-        return animeData;
+        const result = await jikanjs.loadAnime(id);
+        console.log(result);
+        return result;
     } catch (error) {
         console.error(`Error fetching anime data: ${error}`);
     }
@@ -95,8 +75,9 @@ export async function fetchAnime(id) {
 
 export async function fetchManga(id) {
     try {
-        const mangaData = await jikanjs.loadManga(id);
-        return mangaData;
+        const result = await jikanjs.loadManga(id);
+        console.log(result);
+        return result;
     } catch (error) {
         console.error(`Error fetching manga data: ${error}`);
     }
@@ -104,8 +85,9 @@ export async function fetchManga(id) {
 
 export async function fetchCharacter(id) {
     try {
-        const characterData = await jikanjs.loadCharacter(id);
-        return characterData;
+        const result = await jikanjs.loadCharacter(id);
+        console.log(result);
+        return result;
     } catch (error) {
         console.error(`Error fetching character data: ${error}`);
     }
@@ -114,7 +96,7 @@ export async function fetchCharacter(id) {
 export async function fetchUserAnimeList(username, status) {
     const response = await fetch(`https://api.myanimelist.net/v2/users/${username}/animelist?status=${AnimeStatus[status]}`, {
         headers: {
-            'X-MAL-CLIENT-ID': clientID 
+            'X-MAL-CLIENT-ID': clientID
         },
     });
 
@@ -129,7 +111,7 @@ export async function fetchUserAnimeList(username, status) {
 export async function fetchUserMangaList(username, status) {
     const response = await fetch(`https://api.myanimelist.net/v2/users/${username}/mangalist?status=${MangaStatus[status]}`, {
         headers: {
-            'X-MAL-CLIENT-ID': clientID 
+            'X-MAL-CLIENT-ID': clientID
         },
     });
 

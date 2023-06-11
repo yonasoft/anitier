@@ -8,6 +8,9 @@ import * as ActiveStorage from "@rails/activestorage"
 import "channels"
 import 'bootstrap'
 import 'jquery'
+global.fetch = require('node-fetch');
+const { AbortController } = require('node-fetch');
+global.AbortController = AbortController;
 
 Rails.start()
 ActiveStorage.start()

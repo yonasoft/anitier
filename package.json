@@ -23,7 +23,9 @@
   },
   "dependencies": {
     "@mateoaranda/jikanjs": "^1.2.4",
+    "abortcontroller-polyfill": "^1.7.5",
     "anilist-node": "^1.14.0",
-    "react-bootstrap": "^2.7.4"
+    "react-bootstrap": "^2.7.4",
+    "react-spinners": "^0.13.8"
   }
 }

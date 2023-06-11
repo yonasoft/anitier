@@ -11,12 +11,30 @@ module Api
       end
     end
 
+    def show
+      @inventory = Inventory.find_by!(tier_list_id: params[:tier_list_id])
+      render json: {inventory: @inventory, contents: @inventory.contents}
+    end
+
+    def show_by_id
+      @inventory = Inventory.find(params[:id])
+      render json: @inventory
+    end
+
+    # In InventoriesController
+    def show_by_tier_list
+      @inventory = Inventory.find_by!(tier_list_id: params[:tier_list_id])
+          render json: @inventory
+    end
+
     def update
-      if @tier.update(tier_params.except(:content_ids))
-        @tier.contents.replace(Content.where(id: tier_params[:content_ids]))
-        render json: @tier
+      @inventory = Inventory.find(params[:id])
+      
+      if @inventory.update(inventory_params.except(:content_ids))
+        @inventory.contents.replace(Content.where(id: inventory_params[:content_ids]))
+        render json: @inventory
       else
-        render json: @tier.errors, status: :unprocessable_entity
+        render json: @inventory.errors, status: :unprocessable_entity
       end
     end
 

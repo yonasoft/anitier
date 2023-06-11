@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import './create.scss';
 import NavBar from '../navbar/navbar';
-import { postTier, postTierList, fetchUserState, postInventory, updateTierList } from '../../utils/fetch';
+import { postTier, postTierList, fetchUserState,} from '../../utils/fetch';
 
 export default function CreateSetup({ nextStep }) {
 

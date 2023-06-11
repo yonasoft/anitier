@@ -20,6 +20,6 @@ class TierList < ApplicationRecord
   scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }
 
   def create_inventory
-    create_inventory!
+    Inventory.create!(tier_list: self)
   end
 end

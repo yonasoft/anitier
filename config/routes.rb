@@ -10,30 +10,33 @@ Rails.application.routes.draw do
   get '/user/me' => 'static_pages#user'
 
   namespace :api do
-    resources :users
     resources :tier_lists do
+      resource :inventory, only: [:show, :update]
+
       collection do
         get 'recent'
         get 'popular'
         get 'hot'
       end
+
       member do
         get 'user/:user_id', to: 'tier_lists#user_lists'
         get 'user/:user_id/posted', to: 'tier_lists#posted_user_lists'
         get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists'
+        get '/inventory', to: 'tier_lists#inventory' 
       end
-      resources :tiers
     end
+
+    resources :tiers
 
     match 'user/:user_id', to: 'tier_lists#user_lists', via: :get
     match 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', via: :get
     match 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', via: :get
 
     post '/inventories', to: 'inventories#create'
-    get '/tier_lists/:id/inventories', to: 'tier_lists#inventories'
+    get '/api/tier_lists/:tier_list_id/inventory', to: 'inventories#show_by_tier_list'
 
     resources :template_tier_lists
-    resources :tiers
     resources :inventories, only: [:index]
     resources :contents
 

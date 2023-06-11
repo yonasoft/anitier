@@ -3,14 +3,36 @@ import './create.scss';
 import NavBar from '../navbar/navbar'
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { fetchTierList, fetchInventory } from '../../utils/fetch';
+import { BeatLoader } from "react-spinners";
+import { CONTENT_SEARCH_PER_PAGE, ContentType } from '../../utils/constants';
+import { searchAniListContent } from '../../utils/anilist_api';
+
+//TODO: pagination
 
 export default function CreateBuild({ tierListId }) {
 
     const [inventory, setInventory] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [searchInput, setSearchInput] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [contentType, setContentType] = useState(0)
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        status,
+    } = useInfiniteQuery('searchResults', fetchSearchResults, {
+        getNextPageParam: (lastPage, allPages) => lastPage.nextPage,
+    });
+
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
+        source: '', // added
+        content_type: '', // added
         tiers: []
     });
 
@@ -18,15 +40,22 @@ export default function CreateBuild({ tierListId }) {
         if (tierListId) {
             fetchTierList(tierListId).then(data => {
                 setTierList(data);
+                setContentType(ContentType[data.content_type]);
             }).catch(error => {
                 console.error(error);
+            });
+            fetchInventory(tierListId).then(data => {
+                if (Array.isArray(data.contents)) {
+                    setInventory(data.contents);
+                } else {
+                    console.error('Inventory contents data is not an array: ', data.contents);
+                    setInventory([]);
+                }
+            }).catch(error => {
+                console.error(error);
+                setInventory([]);
             });
 
-            fetchInventory(tierListId).then(data => {
-                setInventory(data);
-            }).catch(error => {
-                console.error(error);
-            });
         }
     }, [tierListId]);
 
@@ -36,12 +65,36 @@ export default function CreateBuild({ tierListId }) {
             title: event.target.value
         }));
     }
+    const handleSearch = (event) => {
+        event.preventDefault();
+        setIsLoading(true);  // Start loading animation
+        const source = tierList.source;
+        if (source === 'anilist') {
+            searchAniListContent(contentType, searchInput, page, CONTENT_SEARCH_PER_PAGE) // Pass the page and perPage parameters
+                .then(result => {
+                    setSearchResults(result);
+                    setIsLoading(false);  // Stop loading animation
+                });
+        } else if (source === 'MAL') {
+            // Handle MAL source
+        }
+    }
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+        handleSearch();
+    }
+
 
     const handleDescriptionChange = (event) => {
         setTierList(prevState => ({
             ...prevState,
             description: event.target.value
         }));
+    }
+
+    const handleSearchInputChange = (event) => {
+        setSearchInput(event.target.value);
     }
 
     const addContentToTier = (tierId, content) => {
@@ -67,7 +120,10 @@ export default function CreateBuild({ tierListId }) {
     }
 
     const addContentToInventory = (content) => {
-        setInventory(prevInventory => [...prevInventory, content]);
+        if (!inventory.some(item => item.id === content.id)) {
+            setInventory(prevInventory => [...prevInventory, content]);
+        }
+        console.log(inventory);
     }
 
     const removeContentFromInventory = (contentId) => {
@@ -104,6 +160,17 @@ export default function CreateBuild({ tierListId }) {
         return 'Loading...';
     }
 
+    const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
+        return (
+            <div className="result-item d-flex justify-content-between align-items-center py-2">
+                <div className="d-flex align-items-center">
+                    <img src={result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
+                </div>
+                <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
+            </div>
+        )
+    }
     return (
         <React.Fragment>
             <NavBar />
@@ -112,7 +179,7 @@ export default function CreateBuild({ tierListId }) {
                     <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                         <h1 className="my-2 ">Create(Build)</h1>
                         <div>
-                            <a className="mx-2 my-2 btn btn-secondary" href="/">Cancel</a>
+                            <a className="mx-2 my-2 btn btn-danger" href="/">Cancel</a>
                             <Button className="mx-2 my-2" >Save</Button>
                             <a className="mx-2 my-2 btn btn-primary" href="/">Post</a>
                         </div>
@@ -143,21 +210,35 @@ export default function CreateBuild({ tierListId }) {
                         </div>
                     </div>
                     <div className="col-4 ">
-                        <div className='d-flex flex-column flex-md-row justify-content-between'>
-                            <h3 className="my-2 ">Inventory</h3>
-                            <Button className="my-2 mt-md-0" onClick={handleOpenModal}>Add</Button>
-                            <div id='inventory' className='bg-white'>
-                            </div>
+                        <div className="d-flex flex-column flex-md-row justify-content-between">
+                            <h3 className="my-2">Inventory</h3>
+                            <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
-                        <div className="inventor row bg-secondary w-100"></div>
-                        <Modal show={showModal} onHide={handleCloseModal}>
+                        <div id='inventory' className='bg-white'></div>
+                        <Modal show={showModal} onHide={handleCloseModal} size="xl">
                             <Modal.Header closeButton>
                                 <Modal.Title>Add Items</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
                                     <Tab eventKey="tab1" title="Search">
-                                        {/* content for Tab 1 */}
+                                        <form onSubmit={handleSearch}>
+                                            <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} />
+                                            <Button className="mt-2" type="submit" >Search</Button>
+                                        </form>
+                                        <div
+                                            className="scrollable-results py-2 w-100 h-75"
+                                            onScroll={({ target }) => {
+                                                if (target.scrollHeight - target.scrollTop === target.clientHeight)
+                                                    fetchNextPage();
+                                            }}
+                                        >
+                                            {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
+                                                searchResults.map(result =>
+                                                    <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                                )
+                                            }
+                                        </div>
                                     </Tab>
                                     <Tab eventKey="tab2" title="Import">
                                         {/* content for Tab 2 */}
@@ -167,9 +248,6 @@ export default function CreateBuild({ tierListId }) {
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={handleCloseModal}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={handleCloseModal}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         </Modal>
