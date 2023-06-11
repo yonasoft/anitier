@@ -207,7 +207,7 @@ export default function CreateBuild({ tierListId }) {
                         <div id='inventory' className='bg-white'></div>
                         <Modal show={showModal} onHide={handleCloseModal} size="xl">
                             <Modal.Header closeButton>
-                                <Modal.Title>Add {tierList.content_type.charAt(0).toLocaleUpperCase+tierList.content_type.slice(1)}</Modal.Title>
+                                <Modal.Title>Add {tierList.content_type}</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
