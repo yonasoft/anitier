@@ -7,8 +7,6 @@ import { BeatLoader } from "react-spinners";
 import { CONTENT_SEARCH_PER_PAGE, ContentType } from '../../utils/constants';
 import { searchAniListContent } from '../../utils/anilist_api';
 
-//TODO: pagination
-
 export default function CreateBuild({ tierListId }) {
 
     const [inventory, setInventory] = useState([]);
@@ -18,15 +16,7 @@ export default function CreateBuild({ tierListId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [contentType, setContentType] = useState(0)
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        status,
-    } = useInfiniteQuery('searchResults', fetchSearchResults, {
-        getNextPageParam: (lastPage, allPages) => lastPage.nextPage,
-    });
+
 
     const [tierList, setTierList] = useState({
         title: '',
@@ -160,17 +150,17 @@ export default function CreateBuild({ tierListId }) {
         return 'Loading...';
     }
 
-    const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2">
-                <div className="d-flex align-items-center">
-                    <img src={result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
-                </div>
-                <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
+const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
+    return (
+        <div className="result-item d-flex justify-content-between align-items-center py-2">
+            <div className="d-flex align-items-center">
+                <img src={result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
             </div>
-        )
-    }
+            <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
+        </div>
+    )
+}
     return (
         <React.Fragment>
             <NavBar />
@@ -226,13 +216,7 @@ export default function CreateBuild({ tierListId }) {
                                             <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} />
                                             <Button className="mt-2" type="submit" >Search</Button>
                                         </form>
-                                        <div
-                                            className="scrollable-results py-2 w-100 h-75"
-                                            onScroll={({ target }) => {
-                                                if (target.scrollHeight - target.scrollTop === target.clientHeight)
-                                                    fetchNextPage();
-                                            }}
-                                        >
+                                        <div className="scrollable-results py-2 w-100 h-75">
                                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
                                                 searchResults.map(result =>
                                                     <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
