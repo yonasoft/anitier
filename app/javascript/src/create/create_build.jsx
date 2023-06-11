@@ -150,17 +150,17 @@ export default function CreateBuild({ tierListId }) {
         return 'Loading...';
     }
 
-const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
-    return (
-        <div className="result-item d-flex justify-content-between align-items-center py-2">
-            <div className="d-flex align-items-center">
-                <img src={result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
+    const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
+        return (
+            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
+                <div className="d-flex align-items-center">
+                    <img src={result.coverImage.large || result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
+                </div>
+                <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
             </div>
-            <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
-        </div>
-    )
-}
+        )
+    }
     return (
         <React.Fragment>
             <NavBar />
@@ -207,7 +207,7 @@ const SearchResult = ({ result, contentType, inventory, addContentToInventory })
                         <div id='inventory' className='bg-white'></div>
                         <Modal show={showModal} onHide={handleCloseModal} size="xl">
                             <Modal.Header closeButton>
-                                <Modal.Title>Add Items</Modal.Title>
+                                <Modal.Title>Add {tierList.content_type.charAt(0).toLocaleUpperCase+tierList.content_type.slice(1)}</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
