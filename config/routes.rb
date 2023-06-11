@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   get '/user/me' => 'static_pages#user'
 
   namespace :api do
+    get '/login', to: 'sessions#new'
+    post '/login', to: 'sessions#create'
+    delete '/logout', to: 'sessions#destroy'
+    get '/authenticate', to: 'sessions#authenticate'
+    resources :users, only: [:create]
     resources :tier_lists do
       resource :inventory, only: [:show, :update]
 
@@ -40,9 +45,5 @@ Rails.application.routes.draw do
     resources :inventories, only: [:index]
     resources :contents
 
-    get '/login', to: 'sessions#new'
-    post '/login', to: 'sessions#create'
-    delete '/logout', to: 'sessions#destroy'
-    get '/authenticate', to: 'sessions#authenticate'
   end
 end

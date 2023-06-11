@@ -205,16 +205,16 @@ export default function CreateBuild({ tierListId }) {
                             <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
                         <div id='inventory' className='bg-white'></div>
-                        <Modal show={showModal} onHide={handleCloseModal} size="xl">
+                        <Modal show={showModal} onHide={handleCloseModal} size="xl" className="my-modal">
                             <Modal.Header closeButton>
                                 <Modal.Title>Add {tierList.content_type}</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
                                     <Tab eventKey="tab1" title="Search">
-                                        <form onSubmit={handleSearch}>
-                                            <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} />
-                                            <Button className="mt-2" type="submit" >Search</Button>
+                                        <form className="d-flex mb-3" onSubmit={handleSearch}>
+                                            <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} placeholder={`${tierList.content_type} name`} />
+                                            <Button className="ml-2" type="submit">Search</Button>
                                         </form>
                                         <div className="scrollable-results py-2 w-100 h-75">
                                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
