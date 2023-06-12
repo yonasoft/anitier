@@ -9,11 +9,15 @@
 }
 
 .scrollable-results {
-    max-height: 200px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
 .my-modal .modal-content {
     height: 80vh;
     /* or any other value */
+}
+
+.searchResults {
+    flex-grow: 1;
 }

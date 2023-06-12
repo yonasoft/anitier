@@ -4,8 +4,10 @@ import NavBar from '../navbar/navbar'
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { fetchTierList, fetchInventory } from '../../utils/fetch';
 import { BeatLoader } from "react-spinners";
-import { CONTENT_SEARCH_PER_PAGE, ContentType } from '../../utils/constants';
-import { searchAniListContent } from '../../utils/anilist_api';
+import { CONTENT_SEARCH_PER_PAGE, ContentType, AniListStatus } from '../../utils/constants';
+import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/anilist_api';
+
+//TODO: pagination, turn modal to its own component, and create mal modal
 
 export default function CreateBuild({ tierListId }) {
 
@@ -16,8 +18,9 @@ export default function CreateBuild({ tierListId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [contentType, setContentType] = useState(0)
-
-
+    const [userName, setUserName] = useState('');  // For input field
+    const [status, setStatus] = useState(AniListStatus.CURRENT);  // For select field
+    const [userData, setUserData] = useState([]);
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
@@ -48,6 +51,7 @@ export default function CreateBuild({ tierListId }) {
 
         }
     }, [tierListId]);
+
 
     const handleTitleChange = (event) => {
         setTierList(prevState => ({
@@ -111,9 +115,19 @@ export default function CreateBuild({ tierListId }) {
 
     const addContentToInventory = (content) => {
         if (!inventory.some(item => item.id === content.id)) {
-            setInventory(prevInventory => [...prevInventory, content]);
+            setInventory(prevInventory => [...prevInventory, content.id]);
         }
-        console.log(inventory);
+        console.log(`inventory after content id ${content.id} is added`, inventory);
+    }
+
+    const addAllToInventory = () => {
+        userData.forEach(list => {
+            list.entries.forEach(content => {
+                addContentToInventory(content.media);
+                console.log("media id is", content.media.id);
+            });
+        });
+        console.log("inventory after adding all content", inventory);
     }
 
     const removeContentFromInventory = (contentId) => {
@@ -137,6 +151,30 @@ export default function CreateBuild({ tierListId }) {
         }
     }
 
+    const handleUserNameChange = (event) => {
+        setUserName(event.target.value);
+    }
+
+    const handleStatusChange = (event) => {
+        setStatus(event.target.value);
+    }
+
+    const fetchUserList = (event) => {
+        event.preventDefault();
+
+        if (contentType === ContentType.anime) {
+            fetchUserAniListAnimeList(userName, status).then(data => {
+                setUserData(data);
+                console.log('user data:', userData);
+            });
+        } else if (contentType === ContentType.manga) {
+            fetchUserAniListMangaList(userName, status).then(data => {
+                setUserData(data);
+                console.log('user data:', data);
+            });
+        }
+
+    }
 
     const handleOpenModal = () => {
         setShowModal(true);
@@ -161,6 +199,27 @@ export default function CreateBuild({ tierListId }) {
             </div>
         )
     }
+
+    const SearchResultImport = ({ result, contentType, inventory, addContentToInventory }) => {
+        const coverImage = result.media.coverImage?.large;
+
+        return (
+            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
+                <div className="d-flex align-items-center">
+                    {coverImage && <img src={coverImage} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />}
+                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.media.name.first} ${result.media.name.last}` : result.media.title.english || result.media.title.romaji}</h4>
+                </div>
+                <Button
+                    className="ml-auto ma-2"
+                    disabled={inventory.some(item => item.id === result.media.id)}
+                    onClick={() => addContentToInventory(result.media)}
+                >
+                    Add
+                </Button>
+            </div>
+        )
+    }
+
     return (
         <React.Fragment>
             <NavBar />
@@ -216,7 +275,7 @@ export default function CreateBuild({ tierListId }) {
                                             <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} placeholder={`${tierList.content_type} name`} />
                                             <Button className="ml-2" type="submit">Search</Button>
                                         </form>
-                                        <div className="scrollable-results py-2 w-100 h-75">
+                                        <div className="scrollable-results py-2 w-100 h-80">
                                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
                                                 searchResults.map(result =>
                                                     <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
@@ -225,7 +284,38 @@ export default function CreateBuild({ tierListId }) {
                                         </div>
                                     </Tab>
                                     <Tab eventKey="tab2" title="Import">
-                                        {/* content for Tab 2 */}
+                                        {(tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
+                                        <div>
+                                            <form className="d-flex mb-3">
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={userName}
+                                                    onChange={handleUserNameChange}
+                                                    placeholder={`${tierList.source} username`}
+                                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
+                                                />
+                                                <select
+                                                    className="form-select ml-2"
+                                                    value={status}
+                                                    onChange={handleStatusChange}
+                                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
+                                                >
+                                                    {Object.values(AniListStatus).map((statusValue, index) => (
+                                                        <option key={index} value={statusValue}>{statusValue}</option>
+                                                    ))}
+                                                </select>
+                                                <Button className="ml-2" type="button" onClick={fetchUserList} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Fetch</Button>
+                                            </form>
+                                            <Button className="my-2" onClick={addAllToInventory} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Add All</Button>
+                                        </div>
+                                        <div className="scrollable-results py-2 w-100 h-80">
+                                            {userData.map(list =>
+                                                list.entries.map(result =>
+                                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                                )
+                                            )}
+                                        </div>
                                     </Tab>
                                 </Tabs>
                             </Modal.Body>

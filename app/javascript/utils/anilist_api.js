@@ -1,6 +1,6 @@
 import { ContentType } from '../utils/constants';
 const fetch = require('node-fetch');
-const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
 
 export async function searchAniListContent(contentType, query) {
     switch (contentType) {
@@ -30,7 +30,7 @@ export async function fetchAniListContent(contentType, id) {
     }
 }
 
-async function searchAnilistAnime(query, page = 1, perPage = 10) {
+async function searchAnilistAnime(query, page = 1, perPage = 50) {
     const graphqlQuery = `
     query ($page: Int, $perPage: Int, $search: String) {
       Page(page: $page, perPage: $perPage) {
@@ -81,7 +81,7 @@ async function searchAnilistAnime(query, page = 1, perPage = 10) {
 }
 
 
-async function searchAnilistManga(query, page = 1, perPage = 10) {
+async function searchAnilistManga(query, page = 1, perPage = 50) {
     const graphqlQuery = `
     query ($page: Int, $perPage: Int, $search: String) {
       Page(page: $page, perPage: $perPage) {
@@ -131,7 +131,7 @@ async function searchAnilistManga(query, page = 1, perPage = 10) {
     return data.data.Page.media;
 }
 
-async function searchAnilistCharacter(query, page = 1, perPage = 10) {
+async function searchAnilistCharacter(query, page = 1, perPage = 50) {
     const graphqlQuery = `
     query ($page: Int, $perPage: Int, $search: String) {
       Page(page: $page, perPage: $perPage) {
@@ -302,22 +302,99 @@ export async function fetchAniListCharacter(id) {
 }
 
 export async function fetchUserAniListAnimeList(username, status) {
-    try {
-        const result = await anilist.lists.anime(username, status.toUpperCase());
-        console.log(result);
-        return result;
-    } catch (error) {
-        console.error(`Error fetching user's anime list: ${error}`);
+    const graphqlQuery = `
+    query ($userName: String, $status: MediaListStatus) {
+      MediaListCollection(userName: $userName, type: ANIME, status: $status) {
+        lists {
+          name
+          entries {
+            media {
+              id
+              title {
+                romaji
+                english
+                native
+              }
+              coverImage {
+                large
+              }
+              siteUrl
+            }
+          }
+        }
+      }
     }
+    `;
+
+    const variables = {
+        userName: username,
+        status: status,
+    };
+
+    const response = await fetch('https://graphql.anilist.co', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            query: graphqlQuery,
+            variables: variables,
+        }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data.data.MediaListCollection.lists;
 }
 
 export async function fetchUserAniListMangaList(username, status) {
-    try {
-        const result = await anilist.lists.manga(username, status.toUpperCase());
-        console.log(result);
-        return result;
-    } catch (error) {
-        console.error(`Error fetching user's manga list: ${error}`);
+    const graphqlQuery = `
+    query ($userName: String, $status: MediaListStatus) {
+      MediaListCollection(userName: $userName, type: MANGA, status: $status) {
+        lists {
+          name
+          entries {
+            media {
+              id
+              title {
+                romaji
+                english
+                native
+              }
+              coverImage {
+                large
+              }
+              siteUrl
+            }
+          }
+        }
+      }
     }
+    `;
+
+    const variables = {
+        userName: username,
+        status: status,
+    };
+
+    const response = await fetch('https://graphql.anilist.co', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            query: graphqlQuery,
+            variables: variables,
+        }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data.data.MediaListCollection.lists;
 }
+
+
+
 
