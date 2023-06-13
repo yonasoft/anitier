@@ -70,7 +70,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, contentTy
         return (
             <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
                 <div className="d-flex align-items-center">
-                    <img src={ContentType.character ? result.images.jpg.image_url : result.main_picture.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                    <img src={contentType === ContentType.character ? result.images.jpg.image_url : result.main_picture.large ||} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
                     <h4 className="mb-0">{result.title || result.name}</h4>
                 </div>
                 <Button className="ml-auto ma-2" disabled={inventory.some(item => item === id)} onClick={() => addContentToInventory(id)}>Add</Button>
