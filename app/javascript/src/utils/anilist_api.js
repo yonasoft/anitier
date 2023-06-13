@@ -79,7 +79,6 @@ async function searchAnilistAnime(query, page = 1, perPage = 50) {
   return data.data.Page.media;
 }
 
-
 async function searchAnilistManga(query, page = 1, perPage = 50) {
   const graphqlQuery = `
     query ($page: Int, $perPage: Int, $search: String) {
@@ -178,7 +177,6 @@ async function searchAnilistCharacter(query, page = 1, perPage = 50) {
   console.log(data);
   return data.data.Page.characters;
 }
-
 
 export async function fetchAniListAnime(id) {
   const graphqlQuery = `

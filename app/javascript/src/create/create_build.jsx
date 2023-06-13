@@ -6,8 +6,7 @@ import { fetchTierList, fetchInventory } from '../utils/fetch';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
-
-//TODO: create mal modal
+import Inventory from '../components/inventory/inventory';
 
 export default function CreateBuild({ tierListId }) {
 
@@ -16,8 +15,8 @@ export default function CreateBuild({ tierListId }) {
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
-        source: '', // added
-        content_type: '', // added
+        source: '',
+        content_type: '',
         tiers: []
     });
 
@@ -41,6 +40,7 @@ export default function CreateBuild({ tierListId }) {
             });
 
         }
+
     }, [tierListId]);
 
     const handleTitleChange = (event) => {
@@ -157,12 +157,14 @@ export default function CreateBuild({ tierListId }) {
                             ))}
                         </div>
                     </div>
-                    <div className="col-4 ">
+                    <div className="inventory-col col-4 ">
                         <div className="d-flex flex-column flex-md-row justify-content-between">
                             <h3 className="my-2">Inventory</h3>
                             <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
-                        <div id='inventory' className='bg-white'></div>
+
+                        <Inventory inventoryIds={inventory} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+
                         {tierList.source === 'anilist' && (
                             <AddFromAniListModal
                                 tierList={tierList}

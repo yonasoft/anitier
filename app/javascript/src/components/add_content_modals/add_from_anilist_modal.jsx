@@ -3,6 +3,7 @@ import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { ContentType, AniListStatus } from '../../utils/constants'
 import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/anilist_api';
 import { BeatLoader } from "react-spinners";
+import './add_modal.scss';
 
 export default function AddFromAniListModal({ showModal, handleCloseModal, contentType, inventory, addContentToInventory, tierList }) {
 
@@ -12,6 +13,8 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
     const [userName, setUserName] = useState('');
     const [status, setStatus] = useState(AniListStatus.CURRENT);
     const [userData, setUserData] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
+
 
     useEffect(() => {
         console.log("inventory after adding all content", inventory);
@@ -42,16 +45,22 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
 
     const fetchUserList = (event) => {
         event.preventDefault();
+        setErrorMessage('');
 
-        if (contentType === ContentType.anime) {
-            fetchUserAniListAnimeList(userName, status).then(data => {
-                setUserData(data);
+        const fetchFunction = contentType === ContentType.anime ? fetchUserAniListAnimeList : fetchUserAniListMangaList;
+
+        fetchFunction(userName, status)
+            .then(data => {
+                if (!data || data.length === 0) {
+                    setErrorMessage(`User ${userName} not found or user's list is empty.`);
+                } else {
+                    setUserData(data);
+                }
+            })
+            .catch(error => {
+                console.error(error.message);
+                setErrorMessage(`No user data found`);
             });
-        } else if (contentType === ContentType.manga) {
-            fetchUserAniListMangaList(userName, status).then(data => {
-                setUserData(data);
-            });
-        }
     }
 
     const addAllToInventory = () => {
@@ -119,7 +128,9 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                     <Tab eventKey="tab2" title="Import">
                         {(tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
                         <div>
+                            {errorMessage && <div className="alert alert-danger" role="alert">{errorMessage}</div>}
                             <form className="d-flex mb-3">
+
                                 <input
                                     type="text"
                                     className="form-control"
@@ -153,7 +164,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                 </Tabs>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
+                <Button className="close" variant="secondary" onClick={handleCloseModal}>
                     Close
                 </Button>
             </Modal.Footer>

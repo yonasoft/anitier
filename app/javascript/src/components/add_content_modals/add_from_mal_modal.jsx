@@ -3,6 +3,7 @@ import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { BeatLoader } from "react-spinners";
 import { fetchUserAnimeList, fetchUserMangaList, searchMALContent } from '../../utils/mal_api';
 import { ContentType, AnimeStatus, MangaStatus } from '../../utils/constants';
+import './add_modal.scss';
 
 export default function AddFromMALModal({ showModal, handleCloseModal, contentType, inventory, addContentToInventory, tierList }) {
     const [searchInput, setSearchInput] = useState('');
@@ -11,6 +12,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, contentTy
     const [userName, setUserName] = useState('');
     const [status, setStatus] = useState(contentType === ContentType.anime ? AnimeStatus[0] : MangaStatus[0]); // adjusted for manga
     const [userData, setUserData] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -51,19 +53,26 @@ export default function AddFromMALModal({ showModal, handleCloseModal, contentTy
 
     const fetchUserList = (event) => {
         event.preventDefault();
+        setErrorMessage('');
 
-        if (contentType === ContentType.anime) {
-            fetchUserAnimeList(userName, status).then(data => {
-                setUserData(data);
-                console.log(userData);
+        const fetchFunction = contentType === ContentType.anime ? fetchUserAnimeList : fetchUserMangaList;
+
+        fetchFunction(userName, status)
+            .then(data => {
+                console.log('data', data);
+                if (!data || data.length === 0) {
+                    setErrorMessage(`User ${userName} not found or user's list is empty.`);
+                } else {
+                    setUserData(data);
+                }
+            })
+            .catch(error => {
+                console.error(error.message);
+                setErrorMessage(error.message);
             });
-        } else if (contentType === ContentType.manga) {
-            fetchUserMangaList(userName, status).then(data => {
-                setUserData(data);
-                console.log(userData);
-            });
-        }
     }
+
+
 
     const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
         const id = contentType === ContentType.character ? result.mal_id : result.id;
@@ -104,11 +113,11 @@ export default function AddFromMALModal({ showModal, handleCloseModal, contentTy
             <Modal.Body>
                 <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
                     <Tab eventKey="tab1" title="Search">
+                        {errorMessage && <div className="alert alert-danger" role="alert">{errorMessage}</div>}
                         <form className="d-flex mb-3" onSubmit={handleSearch}>
                             <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} placeholder={`${tierList.content_type} name`} />
                             <Button className="ml-2" type="submit">Search</Button>
                         </form>
-
                         <div className="scrollable-results py-2 w-100 h-80">
                             {isLoading
                                 ? <BeatLoader color="#123abc" loading={isLoading} size={15} />
@@ -163,7 +172,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, contentTy
                 </Tabs>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
+                <Button className="close" variant="secondary" onClick={handleCloseModal}>
                     Close
                 </Button>
             </Modal.Footer>

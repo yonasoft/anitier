@@ -1,0 +1,10 @@
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.scrollable-results {
+    max-height: 400px;
+    overflow-y: auto;
+}

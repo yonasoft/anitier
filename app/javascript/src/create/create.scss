@@ -1,16 +1,5 @@
-#inventory {
-    background-color: white;
-    min-height: 100%;
-    height: auto;
-}
-
 .result-item {
     font-size: 0.8rem;
-}
-
-.scrollable-results {
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 .my-modal .modal-content {
@@ -20,4 +9,15 @@
 
 .searchResults {
     flex-grow: 1;
+}
+
+.inventory-col {
+    min-height: 100vh;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: fit-content;
 }
