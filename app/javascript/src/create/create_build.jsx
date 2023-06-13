@@ -2,25 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './create.scss';
 import NavBar from '../navbar/navbar'
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
-import { fetchTierList, fetchInventory } from '../../utils/fetch';
-import { BeatLoader } from "react-spinners";
-import { CONTENT_SEARCH_PER_PAGE, ContentType, AniListStatus } from '../../utils/constants';
-import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/anilist_api';
+import { fetchTierList, fetchInventory } from '../utils/fetch';
+import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
+import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
+import { ContentType } from '../utils/constants';
 
-//TODO: pagination, turn modal to its own component, and create mal modal
+//TODO: create mal modal
 
 export default function CreateBuild({ tierListId }) {
 
     const [inventory, setInventory] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [searchInput, setSearchInput] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [contentType, setContentType] = useState(0)
-    const [userName, setUserName] = useState('');  // For input field
-    const [status, setStatus] = useState(AniListStatus.CURRENT);  // For select field
-    const [userData, setUserData] = useState([]);
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
@@ -33,7 +25,6 @@ export default function CreateBuild({ tierListId }) {
         if (tierListId) {
             fetchTierList(tierListId).then(data => {
                 setTierList(data);
-                setContentType(ContentType[data.content_type]);
             }).catch(error => {
                 console.error(error);
             });
@@ -52,43 +43,18 @@ export default function CreateBuild({ tierListId }) {
         }
     }, [tierListId]);
 
-
     const handleTitleChange = (event) => {
         setTierList(prevState => ({
             ...prevState,
             title: event.target.value
         }));
     }
-    const handleSearch = (event) => {
-        event.preventDefault();
-        setIsLoading(true);  // Start loading animation
-        const source = tierList.source;
-        if (source === 'anilist') {
-            searchAniListContent(contentType, searchInput, page, CONTENT_SEARCH_PER_PAGE) // Pass the page and perPage parameters
-                .then(result => {
-                    setSearchResults(result);
-                    setIsLoading(false);  // Stop loading animation
-                });
-        } else if (source === 'MAL') {
-            // Handle MAL source
-        }
-    }
-
-    const handlePageChange = (newPage) => {
-        setPage(newPage);
-        handleSearch();
-    }
-
 
     const handleDescriptionChange = (event) => {
         setTierList(prevState => ({
             ...prevState,
             description: event.target.value
         }));
-    }
-
-    const handleSearchInputChange = (event) => {
-        setSearchInput(event.target.value);
     }
 
     const addContentToTier = (tierId, content) => {
@@ -113,21 +79,11 @@ export default function CreateBuild({ tierListId }) {
         }));
     }
 
-    const addContentToInventory = (content) => {
-        if (!inventory.some(item => item.id === content.id)) {
-            setInventory(prevInventory => [...prevInventory, content.id]);
+    const addContentToInventory = (contentId) => {
+        if (!inventory.includes(contentId)) {
+            setInventory(prevInventory => [...prevInventory, contentId]);
         }
-        console.log(`inventory after content id ${content.id} is added`, inventory);
-    }
-
-    const addAllToInventory = () => {
-        userData.forEach(list => {
-            list.entries.forEach(content => {
-                addContentToInventory(content.media);
-                console.log("media id is", content.media.id);
-            });
-        });
-        console.log("inventory after adding all content", inventory);
+        console.log(`inventory after content id ${contentId} is added`, inventory);
     }
 
     const removeContentFromInventory = (contentId) => {
@@ -151,31 +107,6 @@ export default function CreateBuild({ tierListId }) {
         }
     }
 
-    const handleUserNameChange = (event) => {
-        setUserName(event.target.value);
-    }
-
-    const handleStatusChange = (event) => {
-        setStatus(event.target.value);
-    }
-
-    const fetchUserList = (event) => {
-        event.preventDefault();
-
-        if (contentType === ContentType.anime) {
-            fetchUserAniListAnimeList(userName, status).then(data => {
-                setUserData(data);
-                console.log('user data:', userData);
-            });
-        } else if (contentType === ContentType.manga) {
-            fetchUserAniListMangaList(userName, status).then(data => {
-                setUserData(data);
-                console.log('user data:', data);
-            });
-        }
-
-    }
-
     const handleOpenModal = () => {
         setShowModal(true);
     }
@@ -186,38 +117,6 @@ export default function CreateBuild({ tierListId }) {
 
     if (!tierList) {
         return 'Loading...';
-    }
-
-    const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    <img src={result.coverImage.large || result.image.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
-                </div>
-                <Button className="ml-auto ma-2" disabled={inventory.some(item => item.id === result.id)} onClick={() => addContentToInventory(result)}>Add</Button>
-            </div>
-        )
-    }
-
-    const SearchResultImport = ({ result, contentType, inventory, addContentToInventory }) => {
-        const coverImage = result.media.coverImage?.large;
-
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    {coverImage && <img src={coverImage} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />}
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.media.name.first} ${result.media.name.last}` : result.media.title.english || result.media.title.romaji}</h4>
-                </div>
-                <Button
-                    className="ml-auto ma-2"
-                    disabled={inventory.some(item => item.id === result.media.id)}
-                    onClick={() => addContentToInventory(result.media)}
-                >
-                    Add
-                </Button>
-            </div>
-        )
     }
 
     return (
@@ -264,67 +163,28 @@ export default function CreateBuild({ tierListId }) {
                             <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
                         <div id='inventory' className='bg-white'></div>
-                        <Modal show={showModal} onHide={handleCloseModal} size="xl" className="my-modal">
-                            <Modal.Header closeButton>
-                                <Modal.Title>Add {tierList.content_type}</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Tabs defaultActiveKey="tab1" id="uncontrolled-tab-example">
-                                    <Tab eventKey="tab1" title="Search">
-                                        <form className="d-flex mb-3" onSubmit={handleSearch}>
-                                            <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} placeholder={`${tierList.content_type} name`} />
-                                            <Button className="ml-2" type="submit">Search</Button>
-                                        </form>
-                                        <div className="scrollable-results py-2 w-100 h-80">
-                                            {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
-                                                searchResults.map(result =>
-                                                    <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
-                                                )
-                                            }
-                                        </div>
-                                    </Tab>
-                                    <Tab eventKey="tab2" title="Import">
-                                        {(tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
-                                        <div>
-                                            <form className="d-flex mb-3">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    value={userName}
-                                                    onChange={handleUserNameChange}
-                                                    placeholder={`${tierList.source} username`}
-                                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
-                                                />
-                                                <select
-                                                    className="form-select ml-2"
-                                                    value={status}
-                                                    onChange={handleStatusChange}
-                                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
-                                                >
-                                                    {Object.values(AniListStatus).map((statusValue, index) => (
-                                                        <option key={index} value={statusValue}>{statusValue}</option>
-                                                    ))}
-                                                </select>
-                                                <Button className="ml-2" type="button" onClick={fetchUserList} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Fetch</Button>
-                                            </form>
-                                            <Button className="my-2" onClick={addAllToInventory} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Add All</Button>
-                                        </div>
-                                        <div className="scrollable-results py-2 w-100 h-80">
-                                            {userData.map(list =>
-                                                list.entries.map(result =>
-                                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
-                                                )
-                                            )}
-                                        </div>
-                                    </Tab>
-                                </Tabs>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleCloseModal}>
-                                    Close
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
+                        {tierList.source === 'anilist' && (
+                            <AddFromAniListModal
+                                tierList={tierList}
+                                showModal={showModal}
+                                handleCloseModal={handleCloseModal}
+                                contentType={ContentType[tierList.content_type]}
+                                source={tierList.source}
+                                inventory={inventory}
+                                addContentToInventory={addContentToInventory}
+                            />
+                        )}
+                        {tierList.source === 'mal' && (
+                            <AddFromMALModal
+                                tierList={tierList}
+                                showModal={showModal}
+                                handleCloseModal={handleCloseModal}
+                                contentType={ContentType[tierList.content_type]}
+                                source={tierList.source}
+                                inventory={inventory}
+                                addContentToInventory={addContentToInventory}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

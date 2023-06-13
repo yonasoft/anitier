@@ -33,9 +33,9 @@ gem 'bootsnap', '>= 1.4.4', require: false
 
 gem 'bcrypt', '3.1.18'
 
-gem 'jikan.rb'
-
 gem 'acts_as_list'
+
+gem 'dotenv-rails', groups: [:development, :test]
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -4,7 +4,6 @@ export const ContentType = {
     character: 2,
 };
 
-
 export const AniListStatus = {
     CURRENT: "CURRENT",
     COMPLETED: "COMPLETED",

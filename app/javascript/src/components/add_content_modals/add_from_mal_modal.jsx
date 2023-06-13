@@ -1,31 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
-import { ContentType, AniListStatus } from '../../utils/constants'
-import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/anilist_api';
 import { BeatLoader } from "react-spinners";
+import { fetchUserAnimeList, fetchUserMangaList, searchMALContent } from '../../utils/mal_api';
+import { ContentType, AnimeStatus, MangaStatus } from '../../utils/constants';
 
-export default function AddFromAniListModal({ showModal, handleCloseModal, contentType, inventory, addContentToInventory, tierList }) {
-
+export default function AddFromMALModal({ showModal, handleCloseModal, contentType, inventory, addContentToInventory, tierList }) {
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [userName, setUserName] = useState('');
-    const [status, setStatus] = useState(AniListStatus.CURRENT);
+    const [status, setStatus] = useState(contentType === ContentType.anime ? AnimeStatus[0] : MangaStatus[0]); // adjusted for manga
     const [userData, setUserData] = useState([]);
-
-    useEffect(() => {
-        console.log("inventory after adding all content", inventory);
-    }, [inventory]);
 
     const handleSearch = (event) => {
         event.preventDefault();
         setIsLoading(true);
-        searchAniListContent(contentType, searchInput)
+        searchMALContent(contentType, searchInput)
             .then(result => {
                 setSearchResults(result);
+                console.log(searchResults);
                 setIsLoading(false);
             });
+    }
 
+    const addAllToInventory = () => {
+        userData.forEach(content => {
+            const id = contentType === ContentType.character ? content.node.mal_id : content.node.id;
+            if (id) {
+                addContentToInventory(id);
+            }
+        });
     }
 
     const handleSearchInputChange = (event) => {
@@ -37,64 +41,60 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
     }
 
     const handleStatusChange = (event) => {
-        setStatus(event.target.value);
+        const newStatus = event.target.value;
+        if (contentType === ContentType.anime && Object.values(AnimeStatus).includes(newStatus)) {
+            setStatus(newStatus);
+        } else if (contentType === ContentType.manga && Object.values(MangaStatus).includes(newStatus)) {
+            setStatus(newStatus);
+        }
     }
 
     const fetchUserList = (event) => {
         event.preventDefault();
 
         if (contentType === ContentType.anime) {
-            fetchUserAniListAnimeList(userName, status).then(data => {
+            fetchUserAnimeList(userName, status).then(data => {
                 setUserData(data);
+                console.log(userData);
             });
         } else if (contentType === ContentType.manga) {
-            fetchUserAniListMangaList(userName, status).then(data => {
+            fetchUserMangaList(userName, status).then(data => {
                 setUserData(data);
+                console.log(userData);
             });
         }
     }
 
-    const addAllToInventory = () => {
-        userData.forEach(list => {
-            list.entries.forEach(content => {
-                if (content.media) {
-                    addContentToInventory(content.media.id);
-                }
-            });
-        });
-    }
-
     const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
+        const id = contentType === ContentType.character ? result.mal_id : result.id;
         return (
             <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
                 <div className="d-flex align-items-center">
-                    <img src={result.coverImage?.large || result.image?.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
+                    <img src={ContentType.character ? result.images.jpg.image_url : result.main_picture.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                    <h4 className="mb-0">{result.title || result.name}</h4>
                 </div>
-                <Button className="ml-auto ma-2" disabled={inventory.some(item => item === result.id)} onClick={() => addContentToInventory(result.id)}>Add</Button>
+                <Button className="ml-auto ma-2" disabled={inventory.some(item => item === id)} onClick={() => addContentToInventory(id)}>Add</Button>
             </div>
         )
     }
 
     const SearchResultImport = ({ result, contentType, inventory, addContentToInventory }) => {
-        const coverImage = result.media.coverImage?.large;
-
         return (
             <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
                 <div className="d-flex align-items-center">
-                    {coverImage && <img src={coverImage} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />}
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.media.name.first} ${result.media.name.last}` : result.media.title.english || result.media.title.romaji}</h4>
+                    <img src={result.main_picture.large || result.main_picture.medium} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
+                    <h4 className="mb-0">{result.title}</h4>
                 </div>
                 <Button
                     className="ml-auto ma-2"
-                    disabled={inventory.some(item => item === result.media.id)}
-                    onClick={() => addContentToInventory(result.media.id)}
+                    disabled={inventory.some(item => item === result.id)}
+                    onClick={() => addContentToInventory(result.id)}
                 >
                     Add
                 </Button>
             </div>
-        )
-    }
+        );
+    };
 
     return (
         <Modal show={showModal} onHide={handleCloseModal} size="xl" className="my-modal">
@@ -108,16 +108,24 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                             <input type="text" className="form-control" value={searchInput} onChange={handleSearchInputChange} placeholder={`${tierList.content_type} name`} />
                             <Button className="ml-2" type="submit">Search</Button>
                         </form>
+
                         <div className="scrollable-results py-2 w-100 h-80">
-                            {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
-                                searchResults.map(result =>
-                                    <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                            {isLoading
+                                ? <BeatLoader color="#123abc" loading={isLoading} size={15} />
+                                : searchResults?.map(result =>
+                                    <SearchResult
+                                        key={contentType === ContentType.character ? result.mal_id : result.node.id}
+                                        result={contentType === ContentType.character ? result : result.node}
+                                        contentType={contentType}
+                                        inventory={inventory}
+                                        addContentToInventory={addContentToInventory}
+                                    />
                                 )
                             }
                         </div>
                     </Tab>
                     <Tab eventKey="tab2" title="Import">
-                        {(tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
+                        {(ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for My Anime List characters</h1> : <div></div>}
                         <div>
                             <form className="d-flex mb-3">
                                 <input
@@ -126,28 +134,30 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                                     value={userName}
                                     onChange={handleUserNameChange}
                                     placeholder={`${tierList.source} username`}
-                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
+                                    disabled={ContentType[tierList.content_type] === ContentType.character}
                                 />
                                 <select
                                     className="form-select ml-2"
                                     value={status}
                                     onChange={handleStatusChange}
-                                    disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
+                                    disabled={ContentType[tierList.content_type] === ContentType.character}
                                 >
-                                    {Object.values(AniListStatus).map((statusValue, index) => (
+                                    {(contentType === ContentType.anime ? Object.values(AnimeStatus) : Object.values(MangaStatus)).map((statusValue, index) => (
                                         <option key={index} value={statusValue}>{statusValue}</option>
                                     ))}
                                 </select>
-                                <Button className="ml-2" type="button" onClick={fetchUserList} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Fetch</Button>
+
+                                <Button className="ml-2" type="button" onClick={fetchUserList} disabled={
+                                    ContentType[tierList.content_type] === ContentType.character}>Fetch</Button>
                             </form>
-                            <Button className="my-2" onClick={addAllToInventory} disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}>Add All</Button>
+                            <Button className="my-2" onClick={addAllToInventory} disabled={ContentType[tierList.content_type] === ContentType.character}>Add All</Button>
                         </div>
                         <div className="scrollable-results py-2 w-100 h-80">
-                            {userData.map(list =>
-                                list.entries.map(result =>
-                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
-                                )
-                            )}
+                            {isLoading
+                                ? <BeatLoader color="#123abc" loading={isLoading} size={15} />
+                                : userData?.map(result =>
+                                    <SearchResultImport key={result.node.id} result={result.node} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                )}
                         </div>
                     </Tab>
                 </Tabs>

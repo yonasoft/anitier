@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import './create.scss';
 import NavBar from '../navbar/navbar';
-import { postTier, postTierList, fetchUserState,} from '../../utils/fetch';
+import { postTier, postTierList, fetchUserState, } from '../utils/fetch';
 
 export default function CreateSetup({ nextStep }) {
 
@@ -58,7 +58,7 @@ export default function CreateSetup({ nextStep }) {
     }
 
     const addNewTier = () => {
-        setTiers([...tiers, { rank: newTier }]);
+        setTiers([...tiers, { rank: newTier.toUpperCase() }]);
         setNewTier('');
     }
 

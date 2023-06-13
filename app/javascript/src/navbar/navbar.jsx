@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
-import { fetchUserState, logoutUser } from '../../utils/fetch';
+import { fetchUserState, logoutUser } from '../utils/fetch';
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);

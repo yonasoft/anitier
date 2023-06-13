@@ -14,6 +14,10 @@ Rails.application.routes.draw do
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
     get '/authenticate', to: 'sessions#authenticate'
+    get '/search_mal_content', to: 'mal_api#search_mal_content'
+    get '/fetch_mal_content', to: 'mal_api#fetch_mal_content'
+    get '/fetch_user_anime_list', to: 'mal_api#fetch_user_anime_list'
+    get '/fetch_user_manga_list', to: 'mal_api#fetch_user_manga_list'
     resources :users, only: [:create]
     resources :tier_lists do
       resource :inventory, only: [:show, :update]
