@@ -83,7 +83,7 @@ export default function CreateSetup({ nextStep }) {
     return (
         <React.Fragment>
             <NavBar />
-            <div className="container bg-light pa-3">
+            <div className="container-fluid bg-light pa-3">
                 <div className="row align-items-center">
                     <h1 className="col">Create (Setup)</h1>
                     <div className="col-auto d-flex justify-content-end">

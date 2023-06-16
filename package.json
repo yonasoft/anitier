@@ -27,6 +27,7 @@
     "anilist-node": "^1.14.0",
     "graphql": "^16.6.0",
     "jikanjs": "^0.7.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-bootstrap": "^2.7.4",
     "react-spinners": "^0.13.8"
   }

@@ -9,19 +9,21 @@ module Api
 
     def show
       tier_list = TierList.find(params[:id])
-      render json: tier_list.as_json(include: [:tiers, :inventory, :user])
+      render json: tier_list.as_json(
+        include: {
+          tiers: {
+            include: :contents
+          },
+          inventory: {},
+          user: {}
+        }
+      )
     end
 
     def inventory
       tier_list = TierList.find(params[:id])
       @inventory = tier_list.inventory
       render json: @inventory
-    end
-
-    def inventories
-      tier_list = TierList.find(params[:id])
-      @inventories = tier_list.inventories
-      render json: @inventories
     end
 
     def create

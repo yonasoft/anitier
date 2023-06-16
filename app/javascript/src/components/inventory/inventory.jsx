@@ -3,6 +3,8 @@ import { fetchAniListAnime, fetchAniListManga, fetchAniListCharacter, fetchAniLi
 import { fetchMALContentById } from '../../utils/mal_api';
 import { ContentType } from '../../utils/constants'
 import './inventory.scss';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 
 const Inventory = ({ inventoryIds, source, contentType }) => {
     const [inventoryContent, setInventoryContent] = useState([]);

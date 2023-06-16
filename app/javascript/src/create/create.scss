@@ -1,23 +1,4 @@
-.result-item {
-    font-size: 0.8rem;
-}
-
-.my-modal .modal-content {
-    height: 80vh;
-    /* or any other value */
-}
-
-.searchResults {
-    flex-grow: 1;
-}
-
-.inventory-col {
-    min-height: 100vh;
-    height: auto;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    max-width: fit-content;
+#ranks {
+    max-height: 100vh;
+    overflow-y: auto;
 }
