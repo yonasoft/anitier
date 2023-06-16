@@ -1,6 +1,6 @@
 import { ContentType } from '../utils/constants';
 
-const BACKEND_API_BASE_URL = 'http://localhost:3000/';
+const BACKEND_API_BASE_URL = 'https://anitier.herokuapp.com/';
 const JIKAN_API_BASE_URL = 'https://api.jikan.moe/v4';
 
 const contentTypeMapping = {
