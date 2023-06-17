@@ -7,53 +7,41 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 
 const Tier = ({ tier, source, contentType }) => {
-    const [apiIds, setApiIds] = useState([]);
     const [tierContent, setTierContent] = useState([]);
 
-
     useEffect(() => {
-        const fetchContent = async (id) => {
-            let content = null;
-            if (source === 'anilist') {
-                content = await fetchAniListContent(contentType, id)
-                if (content) {
-                    const title = contentType === ContentType.character ? `${content.name.first} ${content.name.last}` : content.title.english || content.title.romaji
-                    const image = content.coverImage?.large || content.image?.large
-                    return { id: content.id, title, image };
-                }
-            } else if (source === 'mal') {
-                content = await fetchMALContentById(contentType, id);
-                if (content) {
-                    const title = content.title || content.name;
-                    const image = contentType === ContentType.character ? content.images.jpg.image_url : content.main_picture.large
-                    return { id: content.id || content.mal_id, title, image };
-                }
-            }
-            return null;
-        }
-
-        const fetchTierContent = async () => {
-            gatherApiIds();
-            const fetchedContents = [];
-            for (let id of apiIds) {
-                const fetchedcontent = await fetchContent(id);
-                if (fetchedcontent) {
-                    fetchedContents.push(fetchedcontent);
-                }
-            }
-            setTierContent(fetchedContents);
-        }
-
         fetchTierContent();
     }, [tier, source, contentType]);
 
-    const gatherApiIds = () => {
-        const gatheredApiIds = [];
-        for (content in tier.contents) {
-            gatherApiIds.push(content.api_id);
+    const fetchContent = async (id) => {
+        let content = null;
+        if (source === 'anilist') {
+            content = await fetchAniListContent(contentType, id)
+            if (content) {
+                const title = contentType === ContentType.character ? `${content.name.first} ${content.name.last}` : content.title.english || content.title.romaji
+                const image = content.coverImage?.large || content.image?.large
+                return { id: content.id, title, image };
+            }
+        } else if (source === 'mal') {
+            content = await fetchMALContentById(contentType, id);
+            if (content) {
+                const title = content.title || content.name;
+                const image = contentType === ContentType.character ? content.images.jpg.image_url : content.main_picture.large
+                return { id: content.id || content.mal_id, title, image };
+            }
         }
-        setApiIds(gatheredApiIds);
-        console.log('gathered api ids', gatheredApiIds);
+        return null;
+    }
+
+    const fetchTierContent = async () => {
+        const fetchedContents = [];
+        for (let content of tier.contents) {
+            const fetchedcontent = await fetchContent(content.api_id);
+            if (fetchedcontent) {
+                fetchedContents.push(fetchedcontent);
+            }
+        }
+        setTierContent(fetchedContents);
     }
 
     return (

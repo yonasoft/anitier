@@ -12,6 +12,7 @@ import Tier from '../components/tier/tier';
 export default function CreateBuild({ tierListId }) {
 
     const [inventory, setInventory] = useState([]);
+    const [tiers, setTiers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [tierList, setTierList] = useState({
         title: '',
@@ -26,6 +27,7 @@ export default function CreateBuild({ tierListId }) {
             fetchTierList(tierListId).then(data => {
                 console.log('tier list at start create build', data);
                 setTierList(data);
+                setTiers(data.tiers);
             }).catch(error => {
                 console.error(error);
             });
@@ -42,56 +44,19 @@ export default function CreateBuild({ tierListId }) {
             });
 
         }
-
     }, [tierListId]);
-    const addContentToTier = (tierId, content) => {
-        setTierList(prevTierList => ({
-            ...prevTierList,
-            tiers: prevTierList.tiers.map(tier =>
-                tier.id === tierId
-                    ? { ...tier, contents: [...tier.contents, content] }
-                    : tier
-            )
-        }));
-    }
 
-    const removeContentFromTier = (tierId, contentId) => {
-        setTierList(prevTierList => ({
-            ...prevTierList,
-            tiers: prevTierList.tiers.map(tier =>
-                tier.id === tierId
-                    ? { ...tier, contents: tier.contents.filter(content => content.id !== contentId) }
-                    : tier
-            )
-        }));
-    }
+
+    useEffect(() => {
+        console.log(`inventory updated`, inventory);
+    }, [inventory]);
+
 
     const addContentToInventory = (contentId) => {
         if (!inventory.includes(contentId)) {
             setInventory(prevInventory => [...prevInventory, contentId]);
         }
         console.log(`inventory after content id ${contentId} is added`, inventory);
-    }
-
-    const removeContentFromInventory = (contentId) => {
-        setInventory(prevInventory => prevInventory.filter(content => content.id !== contentId));
-    }
-
-    const moveContentFromInventoryToTier = (contentId, tierId) => {
-        const content = inventory.find(item => item.id === contentId);
-        if (content) {
-            removeContentFromInventory(contentId);
-            addContentToTier(tierId, content);
-        }
-    }
-
-    const moveContentFromTierToInventory = (tierId, contentId) => {
-        const tier = tierList.tiers.find(tier => tier.id === tierId);
-        const content = tier?.contents.find(content => content.id === contentId);
-        if (content) {
-            removeContentFromTier(tierId, contentId);
-            addContentToInventory(content);
-        }
     }
 
     const handleOpenModal = () => {
@@ -113,7 +78,6 @@ export default function CreateBuild({ tierListId }) {
                 <div className="row">
                     <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                         <h1 className="my-2 ">Create(Build)</h1>
-
                         <div>
                             <a className="mx-2 my-2 btn btn-danger" href="/">Cancel</a>
                             <Button className="mx-2 my-2" >Save</Button>
@@ -124,9 +88,9 @@ export default function CreateBuild({ tierListId }) {
                     <div className="col-8 ">
 
                         <div id="ranks" className="row">
-                            {tierList.tiers.map((tier, index) => (
+                            {tiers.map((tier, index) => (
                                 <Tier
-                                    key={tier.id} tier={tier} source={tierList.source} contentType={tierList.content_type}
+                                    key={tier.id} tier={tier} source={tierList.source} contentType={ContentType[tierList.content_type]}
                                 />
                             ))}
                         </div>
@@ -137,7 +101,8 @@ export default function CreateBuild({ tierListId }) {
                             <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
 
-                        <Inventory inventoryIds={inventory} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+                        <Inventory inventoryIds={inventory} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                        />
 
                         {tierList.source === 'anilist' && (
                             <AddFromAniListModal
@@ -166,4 +131,5 @@ export default function CreateBuild({ tierListId }) {
             </div>
         </React.Fragment>
     );
+
 }
