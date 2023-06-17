@@ -11,7 +11,7 @@ import Tier from '../components/tier/tier';
 
 export default function CreateBuild({ tierListId }) {
 
-    const [inventory, setInventory] = useState([]);
+    const [inventoryAPIds, setInventoryAPIds] = useState([]);
     const [tiers, setTiers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [tierList, setTierList] = useState({
@@ -33,30 +33,33 @@ export default function CreateBuild({ tierListId }) {
             });
             fetchInventory(tierListId).then(data => {
                 if (Array.isArray(data.contents)) {
-                    setInventory(data.contents);
+                    console.log('inventory contents in create build', data.contents);
+                    setInventoryAPIds(data.contents);
                 } else {
                     console.error('Inventory contents data is not an array: ', data.contents);
-                    setInventory([]);
+                    setInventoryAPIds([]);
                 }
             }).catch(error => {
                 console.error(error);
-                setInventory([]);
+                setInventoryAPIds([]);
             });
-
         }
     }, [tierListId]);
 
 
     useEffect(() => {
-        console.log(`inventory updated`, inventory);
-    }, [inventory]);
+        console.log(`inventory updated`, inventoryAPIds); // Changed to inventoryAPIds
+    }, [inventoryAPIds]);
 
+    const isContentIdInInventory = (contentId) => {
+        return inventoryAPIds.includes(contentId);
+    }
 
     const addContentToInventory = (contentId) => {
-        if (!inventory.includes(contentId)) {
-            setInventory(prevInventory => [...prevInventory, contentId]);
+        if (!isContentIdInInventory(contentId)) { // Refactored to use isContentIdInInventory
+            setInventoryAPIds(prevInventory => [...prevInventory, contentId]);
         }
-        console.log(`inventory after content id ${contentId} is added`, inventory);
+        console.log(`inventory after content id ${contentId} is added`, inventoryAPIds);
     }
 
     const handleOpenModal = () => {
@@ -101,17 +104,15 @@ export default function CreateBuild({ tierListId }) {
                             <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                         </div>
 
-                        <Inventory inventoryIds={inventory} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                        <Inventory inventoryIds={inventoryAPIds} source={tierList.source} contentType={ContentType[tierList.content_type]}
                         />
-
                         {tierList.source === 'anilist' && (
                             <AddFromAniListModal
                                 tierList={tierList}
                                 showModal={showModal}
                                 handleCloseModal={handleCloseModal}
                                 contentType={ContentType[tierList.content_type]}
-                                source={tierList.source}
-                                inventory={inventory}
+                                inventory={inventoryAPIds} // Changed to inventoryAPIds
                                 addContentToInventory={addContentToInventory}
                             />
                         )}
@@ -121,8 +122,7 @@ export default function CreateBuild({ tierListId }) {
                                 showModal={showModal}
                                 handleCloseModal={handleCloseModal}
                                 contentType={ContentType[tierList.content_type]}
-                                source={tierList.source}
-                                inventory={inventory}
+                                inventory={inventoryAPIds} // Changed to inventoryAPIds
                                 addContentToInventory={addContentToInventory}
                             />
                         )}

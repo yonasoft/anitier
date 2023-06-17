@@ -5,7 +5,7 @@ import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaL
 import { BeatLoader } from "react-spinners";
 import './add_modal.scss';
 
-export default function AddFromAniListModal({ showModal, handleCloseModal, contentType, inventory, addContentToInventory, tierList }) {
+export default function AddFromAniListModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList }) {
 
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -23,7 +23,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
     const handleSearch = (event) => {
         event.preventDefault();
         setIsLoading(true);
-        searchAniListContent(contentType, searchInput)
+        searchAniListContent(ContentType[tierList.content_type], searchInput)
             .then(result => {
                 setSearchResults(result);
                 setIsLoading(false);
@@ -47,7 +47,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
         event.preventDefault();
         setErrorMessage('');
 
-        const fetchFunction = contentType === ContentType.anime ? fetchUserAniListAnimeList : fetchUserAniListMangaList;
+        const fetchFunction = ContentType[tierList.content_type] === ContentType.anime ? fetchUserAniListAnimeList : fetchUserAniListMangaList;
 
         fetchFunction(userName, status)
             .then(data => {
@@ -120,13 +120,13 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                         <div className="scrollable-results py-2 w-100 h-80">
                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
                                 searchResults.map(result =>
-                                    <SearchResult key={result.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    <SearchResult key={result.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
                                 )
                             }
                         </div>
                     </Tab>
                     <Tab eventKey="tab2" title="Import">
-                        {(tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
+                        {(tierList.source === 'anilist' && ContentType[ContentType[tierList.content_type]] === ContentType.character) ? <h1>Not available for Anilist characters</h1> : <div></div>}
                         <div>
                             {errorMessage && <div className="alert alert-danger" role="alert">{errorMessage}</div>}
                             <form className="d-flex mb-3">
@@ -136,7 +136,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                                     className="form-control"
                                     value={userName}
                                     onChange={handleUserNameChange}
-                                    placeholder={`${tierList.source} username`}
+                                    placeholder={`AniList Username`}
                                     disabled={tierList.source === 'anilist' && ContentType[tierList.content_type] === ContentType.character}
                                 />
                                 <select
@@ -156,7 +156,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, conte
                         <div className="scrollable-results py-2 w-100 h-80">
                             {userData.map(list =>
                                 list.entries.map(result =>
-                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={contentType} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
                                 )
                             )}
                         </div>

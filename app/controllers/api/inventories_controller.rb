@@ -13,8 +13,10 @@ module Api
 
     def show
       @inventory = Inventory.find_by!(tier_list_id: params[:tier_list_id])
-      render json: {inventory: @inventory, contents: @inventory.contents}
+      contents = @inventory.contents.map(&:api_id) # map the contents to their api_ids
+      render json: {inventory: @inventory.id, contents: contents}
     end
+
 
     def show_by_id
       @inventory = Inventory.find(params[:id])
