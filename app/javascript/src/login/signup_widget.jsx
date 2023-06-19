@@ -3,6 +3,7 @@ import './login.scss';
 import NavBar from '../navbar/navbar'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { login, signup } from '../utils/internal_apis/auth_api';
 
 export default function SignUpWidget({ setRequireSignup }) {
 
@@ -15,9 +16,8 @@ export default function SignUpWidget({ setRequireSignup }) {
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
 
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    function handleSignup(e) {
+    async function handleSignup(e) {
         e.preventDefault();
 
         if (username === "" || email === "" || password === "" || confirmPassword === "") {
@@ -45,52 +45,18 @@ export default function SignUpWidget({ setRequireSignup }) {
             return;
         }
 
-        // send a POST request to the server
-        fetch('/api/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': token
-            },
-            body: JSON.stringify({ user: { username: username, email: email, password: password } }),
-            credentials: 'include'
-        }).then(response => {
-            if (response.ok) {
-                return login().then(() => response.json());
-            } else {
-                // If the email or username is not unique, Rails should return a 422 Unprocessable Entity status
-                if (response.status === 422) {
-                    setError("Username or email already exists");
-                }
-                throw new Error("Error: " + response.status);
-            }
-        }).then(data => {
-            handleShow(); // Show the modal
+        try {
+            await signup(username, email, password);
+            await login(username, password, token);
+            handleShow();
             setTimeout(() => {
-                handleClose(); // Close the modal after 3 seconds
-                window.location.href = '/home'; // Navigate to home after 3 seconds
+                handleClose();
+                window.location.href = '/home';
             }, 3000);
-        }).catch(error => console.error('Error:', error));
-    }
-
-    const login = () => {
-        return fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': token
-            },
-            body: JSON.stringify({ username: username, password: password }),
-            credentials: 'include'
-        }).then(response => {
-            if (response.ok) {
-                window.location.href = '/home'; // Redirect to home page
-            } else {
-                response.json().then(data => {
-                    setError(data.error); // Show error message
-                });
-            }
-        });
+        } catch (error) {
+            setError(error.message);
+            console.error('Error:', error);
+        }
     };
 
 

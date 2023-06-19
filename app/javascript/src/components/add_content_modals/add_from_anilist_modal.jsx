@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { ContentType, AniListStatus } from '../../utils/constants'
-import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/anilist_api';
+import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/external_apis/anilist_api';
 import { BeatLoader } from "react-spinners";
 import './add_modal.scss';
+import SearchResultImport from './content_result/search_result_import';
+import SearchResult from './content_result/search_result';
 
 export default function AddFromAniListModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList }) {
 
+    // State Initialization
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -15,10 +18,9 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
     const [userData, setUserData] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-
-    useEffect(() => {
-        console.log("inventory after adding all content", inventory);
-    }, [inventory]);
+    const handleSearchInputChange = (event) => setSearchInput(event.target.value);
+    const handleUserNameChange = (event) => setUserName(event.target.value);
+    const handleStatusChange = (event) => setStatus(event.target.value);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -28,25 +30,11 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                 setSearchResults(result);
                 setIsLoading(false);
             });
-
-    }
-
-    const handleSearchInputChange = (event) => {
-        setSearchInput(event.target.value);
-    }
-
-    const handleUserNameChange = (event) => {
-        setUserName(event.target.value);
-    }
-
-    const handleStatusChange = (event) => {
-        setStatus(event.target.value);
     }
 
     const fetchUserList = (event) => {
         event.preventDefault();
         setErrorMessage('');
-
         const fetchFunction = ContentType[tierList.content_type] === ContentType.anime ? fetchUserAniListAnimeList : fetchUserAniListMangaList;
 
         fetchFunction(userName, status)
@@ -71,38 +59,6 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                 }
             });
         });
-    }
-
-    const SearchResult = ({ result, contentType, inventory, addContentToInventory }) => {
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    <img src={result.coverImage?.large || result.image?.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.name.first} ${result.name.last}` : result.title.english || result.title.romaji}</h4>
-                </div>
-                <Button className="ml-auto ma-2" disabled={inventory.some(item => item === result.id)} onClick={() => addContentToInventory(result.id)}>Add</Button>
-            </div>
-        )
-    }
-
-    const SearchResultImport = ({ result, contentType, inventory, addContentToInventory }) => {
-        const coverImage = result.media.coverImage?.large;
-
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    {coverImage && <img src={coverImage} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />}
-                    <h4 className="mb-0">{contentType === ContentType.character ? `${result.media.name.first} ${result.media.name.last}` : result.media.title.english || result.media.title.romaji}</h4>
-                </div>
-                <Button
-                    className="ml-auto ma-2"
-                    disabled={inventory.some(item => item === result.media.id)}
-                    onClick={() => addContentToInventory(result.media.id)}
-                >
-                    Add
-                </Button>
-            </div>
-        )
     }
 
     return (

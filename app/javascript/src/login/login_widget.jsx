@@ -1,10 +1,10 @@
 import React, { useState } from 'react';// Import useHistory from react-router-dom
 import './login.scss';
+import { login } from '../utils/internal_apis/auth_api';
 
 
 export default function LoginWidget({ setRequireSignup }) {
 
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -18,23 +18,14 @@ export default function LoginWidget({ setRequireSignup }) {
         setPassword(event.target.value);
     };
 
-    const handleLogin = () => { // Add this method
-        fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': token
-            },
-            body: JSON.stringify({ username: username, password: password})
-        }).then(response => {
-            if (response.ok) {
-                window.location.href = '/home'; // Redirect to home page
-            } else {
-                response.json().then(data => {
-                    setError(data.error); // Show error message
-                });
-            }
-        });
+    const handleLogin = async () => {
+        try {
+            await login(username, password);
+            window.location.href = '/home'; // Redirect to home page
+        } catch (error) {
+            setError(error.message); // Show error message
+            console.error('Error:', error);
+        }
     };
 
     return (

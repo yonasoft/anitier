@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
-import { fetchUserState, logoutUser } from '../utils/fetch';
+import { fetchUserState, logout } from '../utils/internal_apis/auth_api';;
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
 
-  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
   useEffect(() => {
     fetchUserState().then(userState => {
@@ -20,7 +19,7 @@ export default function NavBar() {
 
   const logout = async () => {
     try {
-      await logoutUser(token);
+      await logout();
       setLoggedIn(false);
       setUsername("");
     } catch (error) {

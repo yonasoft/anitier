@@ -3,35 +3,11 @@
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     justify-content: start;
     align-content: start;
-    grid-gap: 0.25rem;
+    grid-gap: 0.20rem;
     background-color: white;
-    padding: 0.25rem;
+    padding: 0.20rem;
     min-height: 80vh;
     max-height: 80vh;
     height: auto;
     overflow-y: auto;
-}
-
-.inventory-item {
-    height: 130px;
-    width: 100px;
-    position: relative;
-    margin: 0.25rem;
-}
-
-.inventory-image {
-    height: 100px;
-    width: 100px;
-    object-fit: cover;
-}
-
-.inventory-title {
-    height: 30px;
-    width: 100px;
-    font-size: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
 }

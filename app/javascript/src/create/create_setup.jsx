@@ -1,11 +1,13 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import './create.scss';
 import NavBar from '../navbar/navbar';
-import { postTier, postTierList, fetchUserState, } from '../utils/fetch';
+import { postTier, postTierList } from '../utils/internal_apis/tierlist_apis';
+import { fetchUserState } from '../utils/internal_apis/auth_api';
 
 export default function CreateSetup({ nextStep }) {
 
     const [userId, setUserId] = useState('');
+    const [newTier, setNewTier] = useState('');
     const [tiers, setTiers] = useState([
         { rank: 'S' },
         { rank: 'A' },
@@ -13,18 +15,15 @@ export default function CreateSetup({ nextStep }) {
         { rank: 'C' },
         { rank: 'D' },
     ]);
-
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
         source: 0,  // use the string key here
         content_type: 0,  // and here
         user_id: userId,
-        upvotes: 0,  // Make sure it's a number
+        upvotes: 0,
         downvotes: 0,
     });
-
-    const [newTier, setNewTier] = useState('');
 
     useEffect(() => {
         fetchUserState().then(userState => {
@@ -33,23 +32,10 @@ export default function CreateSetup({ nextStep }) {
         }).catch(error => console.error(error));
     }, []);
 
-    const handleInputChange = (event) => {
-        setTierList({ ...tierList, [event.target.id]: event.target.value });
-    }
-
-    const handleSelectChange = (event) => {
-        setTierList({ ...tierList, [event.target.id]: parseInt(event.target.value) });
-    }
-
-    const handleNewTierChange = (event) => {
-        setNewTier(event.target.value);
-    }
-
-    const handleTierChange = (event, index) => {
-        const newTiers = [...tiers];
-        newTiers[index].rank = event.target.value;
-        setTiers(newTiers);
-    }
+    const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
+    const handleSelectChange = (event) => { setTierList({ ...tierList, [event.target.id]: parseInt(event.target.value) }); }
+    const handleNewTierChange = (event) => { setNewTier(event.target.value); }
+    const handleTierChange = (event, index) => { const newTiers = [...tiers]; newTiers[index].rank = event.target.value; setTiers(newTiers); }
 
     const removeTier = (index) => {
         const newTiers = [...tiers];

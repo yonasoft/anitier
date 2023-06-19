@@ -1,4 +1,4 @@
-import { ContentType } from './constants';
+import { ContentType } from '../constants';
 const fetch = require('node-fetch');
 
 export async function searchAniListContent(contentType, query) {

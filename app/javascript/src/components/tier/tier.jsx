@@ -1,65 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAniListContent } from '../../utils/anilist_api';
-import { fetchMALContentById } from '../../utils/mal_api';
+import { fetchAniListContent } from '../../utils/external_apis/anilist_api';
+import { fetchMALContentById } from '../../utils/external_apis/mal_api';
 import { ContentType } from '../../utils/constants';
 import './tier.scss';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import ContentItem from '../../content_item/content_item';
 
-
-const Tier = ({ tier, source, contentType }) => {
-    const [tierContent, setTierContent] = useState([]);
-
-    useEffect(() => {
-        fetchTierContent();
-    }, [tier, source, contentType]);
-
-    const fetchContent = async (id) => {
-        let content = null;
-        if (source === 'anilist') {
-            content = await fetchAniListContent(contentType, id)
-            if (content) {
-                const title = contentType === ContentType.character ? `${content.name.first} ${content.name.last}` : content.title.english || content.title.romaji
-                const image = content.coverImage?.large || content.image?.large
-                return { id: content.id, title, image };
-            }
-        } else if (source === 'mal') {
-            content = await fetchMALContentById(contentType, id);
-            if (content) {
-                const title = content.title || content.name;
-                const image = contentType === ContentType.character ? content.images.jpg.image_url : content.main_picture.large
-                return { id: content.id || content.mal_id, title, image };
-            }
+const ContentFetcher = async (source, contentType, id) => {
+    let content = null;
+    if (source === 'anilist') {
+        content = await fetchAniListContent(contentType, id);
+        if (content) {
+            const title = contentType === ContentType.character ? `${content.name.first} ${content.name.last}` : content.title.english || content.title.romaji;
+            const image = content.coverImage?.large || content.image?.large;
+            return { id: content.id, title, image };
         }
-        return null;
+    } else if (source === 'mal') {
+        content = await fetchMALContentById(contentType, id);
+        if (content) {
+            const title = content.title || content.name;
+            const image = contentType === ContentType.character ? content.images.jpg.image_url : content.main_picture.large;
+            return { id: content.id || content.mal_id, title, image };
+        }
     }
+    return null;
+};
+
+export default function Tier({ tier, index, source, contentType }) {
+    const [tierContent, setTierContent] = useState([]);
 
     const fetchTierContent = async () => {
         const fetchedContents = [];
         for (let content of tier.contents) {
-            const fetchedcontent = await fetchContent(content.api_id);
+            const fetchedcontent = await ContentFetcher(source, contentType, content.api_id);
             if (fetchedcontent) {
                 fetchedContents.push(fetchedcontent);
             }
         }
         setTierContent(fetchedContents);
-    }
+    };
+
+    useEffect(() => {
+        fetchTierContent();
+    }, [tier, source, contentType]);
 
     return (
-        <div className="d-flex w-100 border-dark" style={{ minHeight: "135px" }}>
-            <div className="text-white d-flex align-items-center justify-content-center" style={{ backgroundColor: "#3F5C9E", width: "75px" }}>
+        <div className="tier d-flex w-100" style={{ minHeight: "135px" }}>
+            <div className="rank text-white d-flex align-items-center justify-content-center" style={{ backgroundColor: "#3F5C9E", width: "75px" }}>
                 {tier.rank}
             </div>
-            <div className="content bg-white flex-grow-1 border-left p-2 d-flex flex-wrap align-content-start overflow-auto" style={{ backgroundColor: '#f7f7f7', maxHeight: "540px" }}>
+
+            <div className="content bg-white flex-grow-1 border-left p-2 d-flex flex-wrap align-content-start overflow-auto">
                 {tierContent.map((item, index) => (
-                    <div key={index} className="content-item">
-                        <img className="content-image" src={item.image} alt={item.title} />
-                        <div className="content-title">{item.title}</div>
-                    </div>
+                    <ContentItem key={item.id} item={item} index={index} />
                 ))}
             </div>
-            <hr className="my-3" style={{ borderColor: "black" }} />
         </div>
-    )
-}
+    );
+};
 
-export default Tier;
+

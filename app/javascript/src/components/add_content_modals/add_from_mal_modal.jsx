@@ -1,47 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Tab, Tabs } from 'react-bootstrap';
 import { BeatLoader } from "react-spinners";
-import { fetchUserAnimeList, fetchUserMangaList, searchMALContent } from '../../utils/mal_api';
+import { fetchUserAnimeList, fetchUserMangaList, searchMALContent } from '../../utils/external_apis/mal_api';
 import { ContentType, AnimeStatus, MangaStatus } from '../../utils/constants';
 import './add_modal.scss';
+import SearchResult from './content_result/search_result';
+import SearchResultImport from './content_result/search_result_import';
+
 
 export default function AddFromMALModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList }) {
+    const initialStatus = ContentType[tierList.content_type] === ContentType.anime ? AnimeStatus[0] : MangaStatus[0];
+
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [userName, setUserName] = useState('');
-    const [status, setStatus] = useState(ContentType[tierList.content_type] === ContentType.anime ? AnimeStatus[0] : MangaStatus[0]); // adjusted for manga
+    const [status, setStatus] = useState(initialStatus);
     const [userData, setUserData] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSearch = (event) => {
-        event.preventDefault();
-        setIsLoading(true);
-        searchMALContent(ContentType[tierList.content_type], searchInput)
-            .then(result => {
-                setSearchResults(result);
-                console.log(searchResults);
-                setIsLoading(false);
-            });
-    }
-
-    const addAllToInventory = () => {
-        userData.forEach(content => {
-            const id = ContentType[tierList.content_type] === ContentType.character ? content.node.mal_id : content.node.id;
-            if (id) {
-                addContentToInventory(id);
-            }
-        });
-    }
-
-    const handleSearchInputChange = (event) => {
-        setSearchInput(event.target.value);
-    }
-
-    const handleUserNameChange = (event) => {
-        setUserName(event.target.value);
-    }
-
+    const handleSearchInputChange = (event) => { setSearchInput(event.target.value); };
+    const handleUserNameChange = (event) => { setUserName(event.target.value); };
     const handleStatusChange = (event) => {
         const newStatus = event.target.value;
         if (ContentType[tierList.content_type] === ContentType.anime && Object.values(AnimeStatus).includes(newStatus)) {
@@ -49,17 +28,24 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
         } else if (ContentType[tierList.content_type] === ContentType.manga && Object.values(MangaStatus).includes(newStatus)) {
             setStatus(newStatus);
         }
-    }
+    };
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        setIsLoading(true);
+        searchMALContent(ContentType[tierList.content_type], searchInput)
+            .then(result => {
+                setSearchResults(result);
+                setIsLoading(false);
+            });
+    };
 
     const fetchUserList = (event) => {
         event.preventDefault();
         setErrorMessage('');
-
         const fetchFunction = ContentType[tierList.content_type] === ContentType.anime ? fetchUserAnimeList : fetchUserMangaList;
-
         fetchFunction(userName, status)
             .then(data => {
-                console.log('data', data);
                 if (!data || data.length === 0) {
                     setErrorMessage(`User ${userName} not found or user's list is empty.`);
                 } else {
@@ -70,39 +56,15 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
                 console.error(error.message);
                 setErrorMessage(error.message);
             });
-    }
+    };
 
-
-
-    const SearchResult = ({ result, inventory, addContentToInventory }) => {
-        const id = ContentType[tierList.content_type] === ContentType.character ? result.mal_id : result.id;
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    <img src={ContentType[tierList.content_type] === ContentType.character ? result.images.jpg.image_url : result.main_picture.large} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{result.title || result.name}</h4>
-                </div>
-                <Button className="ml-auto ma-2" disabled={inventory.some(item => item === id)} onClick={() => addContentToInventory(id)}>Add</Button>
-            </div>
-        )
-    }
-
-    const SearchResultImport = ({ result, inventory, addContentToInventory }) => {
-        return (
-            <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
-                <div className="d-flex align-items-center">
-                    <img src={result.main_picture.large || result.main_picture.medium} style={{ height: '60px', width: '60px', marginRight: '10px' }} alt="content" />
-                    <h4 className="mb-0">{result.title}</h4>
-                </div>
-                <Button
-                    className="ml-auto ma-2"
-                    disabled={inventory.some(item => item === result.id)}
-                    onClick={() => addContentToInventory(result.id)}
-                >
-                    Add
-                </Button>
-            </div>
-        );
+    const addAllToInventory = () => {
+        userData.forEach(content => {
+            const id = ContentType[tierList.content_type] === ContentType.character ? content.node.mal_id : content.node.id;
+            if (id) {
+                addContentToInventory(id);
+            }
+        });
     };
 
     return (
