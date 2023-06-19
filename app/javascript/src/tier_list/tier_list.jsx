@@ -3,6 +3,8 @@ import './tier_list.scss';
 import NavBar from '../components/navbar/navbar'
 import { fetchUserState } from '../utils/internal_apis/auth_api';
 import { fetchInventory, fetchTierList } from '../utils/internal_apis/tierlist_apis';
+import OwnerTierList from './owner_tier_list';
+import UserTierList from './user_tier_list';
 
 
 export default function Create({ tierListId }) {
@@ -53,7 +55,7 @@ export default function Create({ tierListId }) {
             if(user_id == tierList.user_id){
                 <OwnerTierList tierList={tierList} inventoryAPIds={inventoryAPIds} setInventoryAPIds={setInventoryAPIds} tiers={tiers} setTiers={setTiers} />
             } else {
-                <CreateBuild tierList={tierList} inventoryAPIds={inventoryAPIds} tiers={tiers} />}
+                <UserTierList tierList={tierList} inventoryAPIds={inventoryAPIds} tiers={tiers} />}
         </div>
     );
 }
