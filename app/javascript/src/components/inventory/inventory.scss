@@ -11,3 +11,14 @@
     height: auto;
     overflow-y: auto;
 }
+
+.inventory-drop {
+    min-height: 100vh;
+    max-height: 100vh;
+}
+
+.tier-wrapper {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+}

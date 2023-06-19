@@ -112,7 +112,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                         <div className="scrollable-results py-2 w-100 h-80">
                             {userData.map(list =>
                                 list.entries.map(result =>
-                                    result.media && <SearchResultImport key={result.media.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    result.media && <SearchResultImport key={result.media.id} result={result.media} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
                                 )
                             )}
                         </div>

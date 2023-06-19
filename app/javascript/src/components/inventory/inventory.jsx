@@ -4,6 +4,7 @@ import { fetchMALContentById } from '../../utils/external_apis/mal_api';
 import { ContentType } from '../../utils/constants'
 import './inventory.scss';
 import ContentItem from '../../content_item/content_item';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 const ContentFetcher = async (source, contentType, id) => {
     let content = null;
@@ -43,21 +44,19 @@ export default function Inventory({ inventoryIds, setInventoeryIds, source, cont
         fetchInventory();
     }, [inventoryIds, source, contentType]);
 
-    const handleOnDragEnd = (result) => {
-        if (!result.destination) return;
-        const items = Array.from(inventoryIds);
-        const [reordderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reordderedItem);
-
-        setInventoeryIds(items);
-    };
-
     return (
-        <div id='inventory' className='bg-white grid scrollable-results py-2 mb-2 overflow-auto'>
-            {inventoryContent.map((item, index) => (
-                <ContentItem key={item.id} item={item} index={index} />
-            ))}
-        </div>
+        <Droppable className='inventory-drop' droppableId='inventory'>
+            {(provided, snapshot) => (
+                <div {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    id='inventory' className='bg-white grid scrollable-results py-2 mb-2 overflow-auto'>
+                    {inventoryContent.map((item, index) => (
+                        <ContentItem key={item.id || item.mal_id} item={item} index={index} />
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
     );
 }
 

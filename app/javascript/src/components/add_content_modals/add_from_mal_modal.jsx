@@ -49,6 +49,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
                 if (!data || data.length === 0) {
                     setErrorMessage(`User ${userName} not found or user's list is empty.`);
                 } else {
+                    console.log('user data', data);
                     setUserData(data);
                 }
             })
