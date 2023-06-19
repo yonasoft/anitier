@@ -7,7 +7,7 @@ import OwnerTierList from './owner_tier_list';
 import UserTierList from './user_tier_list';
 
 
-export default function Create({ tierListId }) {
+export default function TierList({ tierListId }) {
     const [userId, setUserId] = useState('');
     const [inventoryAPIds, setInventoryAPIds] = useState([]);
     const [tiers, setTiers] = useState([]);
