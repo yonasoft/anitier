@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './create.scss';
-import NavBar from '../navbar/navbar'
+
 import CreateBuild from './create_build';
 import CreateSetup from './create_setup';
 

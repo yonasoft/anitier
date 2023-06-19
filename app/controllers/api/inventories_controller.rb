@@ -1,5 +1,7 @@
 module Api
   class InventoriesController < ApplicationController
+    before_action :set_inventory, only: [:show, :update]
+
     def create
       @inventory = Inventory.new(inventory_params.except(:content_ids))
 
@@ -7,33 +9,22 @@ module Api
         @inventory.contents << Content.where(id: inventory_params[:content_ids])
         render json: @inventory, status: :created
       else
-        render json: @inventory.errors, status: :unprocessable_entity
+        render json: {errors: @inventory.errors.full_messages}, status: :unprocessable_entity
       end
     end
 
     def show
-      @inventory = Inventory.find_by!(tier_list_id: params[:tier_list_id])
-      contents = @inventory.contents.map(&:api_id) # map the contents to their api_ids
+      contents = @inventory.contents.map(&:api_id) 
       render json: {inventory: @inventory.id, contents: contents}
     end
 
-
     def show_by_id
-      @inventory = Inventory.find(params[:id])
       render json: @inventory
     end
 
-    # In InventoriesController
-    def show_by_tier_list
-      @inventory = Inventory.find_by!(tier_list_id: params[:tier_list_id])
-          render json: @inventory
-    end
-
     def update
-      @inventory = Inventory.find(params[:id])
-      
       if @inventory.update(inventory_params.except(:content_ids))
-        @inventory.contents.replace(Content.where(id: inventory_params[:content_ids]))
+        @inventory.contents = Content.where(id: inventory_params[:content_ids])
         render json: @inventory
       else
         render json: @inventory.errors, status: :unprocessable_entity
@@ -44,6 +35,12 @@ module Api
 
     def inventory_params
       params.require(:inventory).permit(:tier_list_id, content_ids: [])
+    end
+
+    def set_inventory
+      @inventory = Inventory.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: {errors: ['Inventory not found']}, status: :not_found
     end
   end
 end

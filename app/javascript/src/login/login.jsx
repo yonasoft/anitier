@@ -1,7 +1,7 @@
 // home.jsx
 import React, { useState } from 'react';
 import './login.scss';
-import NavBar from '../navbar/navbar'
+import NavBar from '../components/navbar/navbar';
 import LoginWidget from './login_widget';
 import SignUpWidget from './signup_widget';
 

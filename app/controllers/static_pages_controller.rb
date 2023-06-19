@@ -18,6 +18,7 @@ class StaticPagesController < ApplicationController
   end
 
   def tier_list
+    @tier_list_id = params[:id]
   end
 
   def templates

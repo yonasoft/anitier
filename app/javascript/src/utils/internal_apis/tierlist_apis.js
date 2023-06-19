@@ -217,11 +217,9 @@ export async function postTier(tier, tierListId, contentIds = []) {
 }
 
 export async function updateTier(tierId, contentApiIds = []) {
-
     const contentIds = [];
-    for (const apiId of contentApiIds) {
-        const contentData = await fetchContentFromAPI(apiId);
-        const newContent = await createContent(contentData);
+    for (const id of contentApiIds) {
+        const newContent = await createContent(id);
         contentIds.push(newContent.id);
     }
 
@@ -245,8 +243,8 @@ export async function updateTier(tierId, contentApiIds = []) {
     return await response.json();
 }
 
-export async function fetchInventory(tierListId) {
-    const response = await fetch(`/api/tier_lists/${tierListId}/inventory`, {
+export async function fetchInventory(inventoryId) {
+    const response = await fetch(`/api/inventories/${inventoryId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -263,10 +261,13 @@ export async function fetchInventory(tierListId) {
     return responseData;
 }
 
-async function updateInventory(tierListId, contentIds = []) {
-    // Get the inventoryId from the tierList first
-    const inventoryData = await fetchInventory(tierListId);
-    const inventoryId = inventoryData.id;
+
+export async function updateInventory(inventoryId, contentApiIds = []) {
+    const contentIds = [];
+    for (const id of contentApiIds) {
+        const newContent = await createContent(id);
+        contentIds.push(newContent.id);
+    }
 
     const response = await fetch(`/api/inventories/${inventoryId}`, {
         method: 'PATCH',
@@ -276,37 +277,80 @@ async function updateInventory(tierListId, contentIds = []) {
         },
         body: JSON.stringify({
             inventory: {
-                tier_list_id: tierListId,
-                content_ids: Array.isArray(contentIds) ? contentIds : [contentIds]
+                content_ids: contentIds
             }
         })
     });
 
     if (!response.ok) {
-        throw new Error(`Error updating inventory: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-
-export async function createContent(contentData) {
-    const response = await fetch('/api/contents', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        },
-        body: JSON.stringify({
-            content: contentData
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error creating content: ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     return await response.json();
 }
+
+export async function createContent(contentApiId, inventoryIds = [], tierIds = []) {
+    // Fetch the content using the contentApiId
+    let contentResponse = await fetch(`/api/contents/${contentApiId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+
+    if (contentResponse.ok) {
+        // If the content already exists, update it
+        let responseData = await contentResponse.json();
+        let existingInventoryIds = responseData.inventory_ids || [];
+        let existingTierIds = responseData.tier_ids || [];
+
+        let response = await fetch(`/api/contents/${responseData.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': token
+            },
+            body: JSON.stringify({
+                content: {
+                    inventory_ids: [...existingInventoryIds, ...inventoryIds],
+                    tier_ids: [...existingTierIds, ...tierIds]
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error updating content: ${response.statusText}`);
+        }
+
+        responseData = await response.json();
+        return responseData;
+    } else {
+        // If the content does not exist, create it
+        let response = await fetch('/api/contents', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': token
+            },
+            body: JSON.stringify({
+                content: {
+                    api_id: contentApiId,
+                    inventory_ids: inventoryIds,
+                    tier_ids: tierIds
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error creating content: ${response.statusText}`);
+        }
+
+        let responseData = await response.json();
+        return responseData;
+    }
+}
+
+
+
 

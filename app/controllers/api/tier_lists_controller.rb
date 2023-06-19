@@ -1,29 +1,18 @@
 module Api
   class TierListsController < ApplicationController
-    before_action :set_tier_list, only: %i(show update destroy)
-
+    before_action :set_tier_list, only: %i(show update destroy inventory)
+    
     def index
       @tier_lists = TierList.all
       render json: @tier_lists
     end
 
     def show
-      tier_list = TierList.find(params[:id])
-      render json: tier_list.as_json(
-        include: {
-          tiers: {
-            include: :contents
-          },
-          inventory: {},
-          user: {}
-        }
-      )
+      render json: @tier_list.as_json(include: { tiers: { include: :contents }, inventory: {}, user: {} })
     end
 
     def inventory
-      tier_list = TierList.find(params[:id])
-      @inventory = tier_list.inventory
-      render json: @inventory
+      render json: @tier_list.inventory
     end
 
     def create
@@ -38,8 +27,6 @@ module Api
     end
 
     def update
-      @tier_list = TierList.find(params[:id])
-
       if @tier_list.update(tier_list_params)
         render json: @tier_list.as_json(include: :inventory)
       else
@@ -92,12 +79,6 @@ module Api
 
     def tier_list_params
       params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes, :posted)
-    end
-
-    def inventory
-      tier_list = TierList.find(params[:id])
-      @inventory = tier_list.inventory
-      render json: @inventory
     end
   end
 end

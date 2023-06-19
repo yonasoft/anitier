@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import './create.scss';
-import NavBar from '../navbar/navbar';
+import NavBar from '../components/navbar/navbar';
 import { postTier, postTierList } from '../utils/internal_apis/tierlist_apis';
 import { fetchUserState } from '../utils/internal_apis/auth_api';
 

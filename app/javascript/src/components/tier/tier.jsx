@@ -3,7 +3,7 @@ import { fetchAniListContent } from '../../utils/external_apis/anilist_api';
 import { fetchMALContentById } from '../../utils/external_apis/mal_api';
 import { ContentType } from '../../utils/constants';
 import './tier.scss';
-import ContentItem from '../../content_item/content_item';
+import ContentItem from '../content_item/content_item';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 const ContentFetcher = async (source, contentType, id) => {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './login.scss';
-import NavBar from '../navbar/navbar'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { login, signup } from '../utils/internal_apis/auth_api';

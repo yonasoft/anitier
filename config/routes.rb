@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   get '/create' => 'static_pages#create'
   get '/templates' => 'static_pages#templates'
   get '/tierlist/:id' => 'static_pages#tier_list'
-  get '/templatetierlist/:id' => 'static_pages#template_tier_list'  # NEW LINE
+  get '/templatetierlist/:id' => 'static_pages#template_tier_list'
   get '/user/:id' => 'static_pages#user'
   get '/user/me' => 'static_pages#user'
 
@@ -20,7 +20,7 @@ Rails.application.routes.draw do
     get '/fetch_user_manga_list', to: 'mal_api#fetch_user_manga_list'
     resources :users, only: [:create]
     resources :tier_lists do
-      resource :inventory, only: [:show, :update]
+      resource :inventory, only: [:show]
 
       collection do
         get 'recent'
@@ -31,23 +31,19 @@ Rails.application.routes.draw do
       member do
         get 'user/:user_id', to: 'tier_lists#user_lists'
         get 'user/:user_id/posted', to: 'tier_lists#posted_user_lists'
-        get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists'
-        get '/inventory', to: 'tier_lists#inventory' 
+        get 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists' 
       end
     end
 
     resources :tiers
+    resources :inventories, only: [:show, :update]
 
     match 'user/:user_id', to: 'tier_lists#user_lists', via: :get
     match 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', via: :get
     match 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', via: :get
 
-    post '/inventories', to: 'inventories#create'
-    get '/api/tier_lists/:tier_list_id/inventory', to: 'inventories#show_by_tier_list'
-
     resources :template_tier_lists
-    resources :inventories, only: [:index]
+    resource :inventory, only: [:show, :update]
     resources :contents
-
   end
 end

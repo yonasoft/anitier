@@ -1,49 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import './create.scss';
+import './tier_list.scss';
+import NavBar from '../components/navbar/navbar';
 import { Button } from 'react-bootstrap';
-import { fetchTierList, fetchInventory, updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
+import { updateTier } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
 import Inventory from '../components/inventory/inventory';
 import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
-import NavBar from '../components/navbar/navbar';
 
-export default function CreateBuild({ tierListId }) {
+export default function OwnerTierList(tierList, inventoryAPIds, setInventoryAPIds, tiers, setTiers) {
 
-    const [inventoryAPIds, setInventoryAPIds] = useState([]);
-    const [tiers, setTiers] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [tierList, setTierList] = useState({
-        source: '',
-        content_type: '',
-    });
-
-    useEffect(() => {
-        if (tierListId) {
-            fetchTierList(tierListId).then(data => {
-                setTierList(data);
-                console.log('tier list data', data);
-                setTiers(data.tiers);
-                console.log('tiers data', data.tiers);
-            }).catch(console.error);
-
-            fetchInventory(tierListId).then(data => {
-                if (Array.isArray(data.contents)) {
-                    console.log('inventory contents', data.contents);
-                    setInventoryAPIds(data.contents);
-                } else {
-                    console.error('Inventory contents data is not an array: ', data.contents);
-                    setInventoryAPIds([]);
-                }
-            }).catch(error => {
-                console.error(error);
-                setInventoryAPIds([]);
-            });
-        }
-    }, [tierListId]);
-
     useEffect(() => {
         updateInventory(tierListId, inventoryAPIds)
             .catch(console.error);

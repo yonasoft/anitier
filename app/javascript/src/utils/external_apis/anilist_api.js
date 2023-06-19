@@ -217,9 +217,6 @@ export async function fetchAniListAnime(id) {
   return data.data.Media;
 }
 
-// You can use the same structure to update fetchAniListManga and fetchAniListCharacter
-
-
 export async function fetchAniListManga(id) {
   const graphqlQuery = `
     query ($id: Int) {
