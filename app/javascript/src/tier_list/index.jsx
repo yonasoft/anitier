@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TierList from './TierList';
+import TierList from './tier_list';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const node = document.getElementById('tier-list-root');
