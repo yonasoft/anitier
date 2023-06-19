@@ -50,7 +50,7 @@ export default function Tier({ tier, tierIndex, source, contentType }) {
             <div className="rank text-white d-flex align-items-center justify-content-center" style={{ backgroundColor: "#3F5C9E", width: "75px" }}>
                 {tier.rank}
             </div>
-            <Droppable droppableId={tierIndex.toString()} className='w-100'>
+            <Droppable droppableId={tierIndex.toString()} direction="horizontal">
                 {(provided, snapshot) => (
                     <div
                         {...provided.droppableProps}
@@ -66,4 +66,5 @@ export default function Tier({ tier, tierIndex, source, contentType }) {
             </Droppable>
         </div>
     );
+
 };

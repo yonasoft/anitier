@@ -54,6 +54,27 @@ export default function CreateBuild({ tierListId }) {
         }
     }
 
+    const updateTier = (tier, sourceIndex, destinationIndex, draggableId) => {
+        console.log('tier in updateTier', tier);
+        const copy = Array.from(tier.contents);
+
+        // If sourceIndex is not null, we're moving an item from it
+        if (sourceIndex !== null) {
+            copy.splice(sourceIndex, 1);
+        }
+
+        // If destinationIndex is not null, we're adding an item to it
+        if (destinationIndex !== null) {
+            copy.splice(destinationIndex, 0, parseInt(draggableId));
+        }
+
+        return {
+            ...tier,
+            contents: copy,
+        };
+    };
+
+
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
@@ -64,6 +85,11 @@ export default function CreateBuild({ tierListId }) {
         if (source.droppableId === destination.droppableId && source.index === destination.index) {
             return;
         }
+
+        console.log("source:", source);
+        console.log("destination:", destination);
+        console.log("tiers:", tiers);
+
 
         if (source.droppableId === 'inventory') {
             const start = inventoryAPIds;
@@ -107,6 +133,27 @@ export default function CreateBuild({ tierListId }) {
                 newTiers[parseInt(source.droppableId)] = newTier;
 
                 setTiers(newTiers);
+            }
+            if (destination.droppableId === 'inventory') {
+                const start = tiers[parseInt(source.droppableId)];
+                const startCopy = Array.from(start.contents);
+
+                console.log('draggable id', draggableId);
+                startCopy.splice(source.index, 1);
+
+                const newTier = {
+                    ...start,
+                    contents: startCopy
+                };
+
+                const newTiers = [...tiers];
+                newTiers[parseInt(source.droppableId)] = newTier;
+
+                setTiers(newTiers);
+
+                const inventoryCopy = Array.from(inventoryAPIds);
+                inventoryCopy.splice(destination.index, 0, parseInt(draggableId));
+                setInventoryAPIds(inventoryCopy);
             } else {
                 const start = tiers[parseInt(source.droppableId)];
                 const finish = tiers[parseInt(destination.droppableId)];
