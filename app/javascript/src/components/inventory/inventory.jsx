@@ -32,7 +32,7 @@ export default function Inventory({ inventoryContentIds }) {
                     {inventoryContent && inventoryContent.filter(item => item).map((item, index) => (
                         <ContentItem key={item.id} item={item} index={index} />
                     ))}
-
+                    {provided.placeholder}
                 </div>
             )}
         </Droppable>

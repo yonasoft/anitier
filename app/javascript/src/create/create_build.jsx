@@ -98,7 +98,57 @@ export default function CreateBuild({ tierListId }) {
 
 
     const onDragEnd = (result) => {
+        const { destination, source, draggableId } = result;
 
+        if (!destination) {
+            return;
+        }
+
+        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            return;
+        }
+
+        const start = source.droppableId === 'inventory' ? inventory : tiers[source.droppableId];
+        const finish = destination.droppableId === 'inventory' ? inventory : tiers[destination.droppableId];
+
+        // Moving within the same list
+        if (start === finish) {
+            const newList = Array.from(start.content_ids);
+            newList.splice(source.index, 1);
+            newList.splice(destination.index, 0, draggableId);
+
+            if (start === inventory) {
+                setInventory({ ...inventory, content_ids: newList });
+            } else {
+                setTiers(prevState => prevState.map(tier => tier.id === start.id ? { ...tier, content_ids: newList } : tier));
+            }
+        } else {
+            // Moving from one list to another
+            const startList = Array.from(start.content_ids);
+            startList.splice(source.index, 1);
+            const finishList = Array.from(finish.content_ids);
+            finishList.splice(destination.index, 0, draggableId);
+
+            if (start === inventory) {
+                setInventory({ ...inventory, content_ids: startList });
+                setTiers(prevState => prevState.map(tier => tier.id === finish.id ? { ...tier, content_ids: finishList } : tier));
+            } else if (finish === inventory) {
+                setTiers(prevState => prevState.map(tier => tier.id === start.id ? { ...tier, content_ids: startList } : tier));
+                setInventory({ ...inventory, content_ids: finishList });
+            } else {
+                setTiers(prevState => {
+                    return prevState.map(tier => {
+                        if (tier.id === start.id) {
+                            return { ...tier, content_ids: startList };
+                        } else if (tier.id === finish.id) {
+                            return { ...tier, content_ids: finishList };
+                        } else {
+                            return tier;
+                        }
+                    });
+                });
+            }
+        }
     };
 
 
@@ -106,7 +156,7 @@ export default function CreateBuild({ tierListId }) {
 
     return (
         <React.Fragment>
-            <DragDropContext onDragEnd={result => console.log(result)}>
+            <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <NavBar />
                 <div className="container-fluid bg-light pa-3">
                     <div className="row">

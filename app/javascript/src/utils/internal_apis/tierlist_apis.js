@@ -258,7 +258,7 @@ export async function updateTier(tierId, contentIds = []) {
     }
 
     const responseData = await response.json();
-    responseData.tier.content_ids = responseData.tier.content_ids || [];
+    responseData.content_ids = responseData.content_ids || [];
     return responseData;
 }
 

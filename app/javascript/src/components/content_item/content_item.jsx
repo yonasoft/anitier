@@ -15,7 +15,7 @@ export default function ContentItem({ item, index }) {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    style={{ userSelect: 'none', ...provided.draggableProps.style }}
+                    style={{ userSelect: 'none', ...provided.draggableProps.style, backgroundColor: snapshot.isDragging ? '#263B4A' : '#FFFFFF' }}
                     className='content-item'
                 >
                     {image && <img className='content-image' src={image} alt={name} />}
