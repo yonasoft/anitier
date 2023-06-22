@@ -28,22 +28,6 @@ const ContentFetcher = async (source, contentType, id) => {
 };
 
 export default function Tier({ tier, tierIndex, source, contentType }) {
-    const [tierContent, setTierContent] = useState([]);
-
-    const fetchTierContent = async () => {
-        const fetchedContents = [];
-        for (let api_id of tier.contents) {
-            const fetchedcontent = await ContentFetcher(source, contentType, api_id);
-            if (fetchedcontent) {
-                fetchedContents.push(fetchedcontent);
-            }
-        }
-        setTierContent(fetchedContents);
-    };
-
-    useEffect(() => {
-        fetchTierContent();
-    }, [tier, source, contentType]);
 
     return (
         <div className="tier d-flex w-100" style={{ minHeight: "135px", maxHeight: "270px" }}>
@@ -57,7 +41,7 @@ export default function Tier({ tier, tierIndex, source, contentType }) {
                         ref={provided.innerRef}
                         className='content bg-white p-2 w-100'
                     >
-                        {tierContent.map((item, index) => (
+                        {tier && tier.contents && tier.contents.map((item, index) => (
                             <ContentItem key={item.id} item={item} index={index} />
                         ))}
                         {provided.placeholder}
@@ -68,3 +52,4 @@ export default function Tier({ tier, tierIndex, source, contentType }) {
     );
 
 };
+

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './tier_list.scss';
 import NavBar from '../components/navbar/navbar';
 import { Button } from 'react-bootstrap';
-import { updateTier } from '../utils/internal_apis/tierlist_apis';
+import { updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -10,17 +10,51 @@ import Inventory from '../components/inventory/inventory';
 import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
 
-export default function OwnerTierList(tierList, inventoryAPIds, setInventoryAPIds, tiers, setTiers) {
+export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, setInventoryAPIds, tiers, setTiers }) {
 
     const [showModal, setShowModal] = useState(false);
     useEffect(() => {
-        updateInventory(tierListId, inventoryAPIds)
-            .catch(console.error);
-        tiers.forEach(tier => {
-            updateTier(tier.id, tier.contents)
-                .catch(console.error);
-        });
+        console.log('tier list in owner tier list', tierList);
+        console.log('inventoryAPIds in owner tier list', inventoryAPIds);
+        console.log('tiers in owner tier list', tiers);
+    }, [tierList, inventoryAPIds, tiers])
+
+    useEffect(() => {
+        saveTierList()
+        // fetchTierList(tierListId).then(data => {
+        //     setTierList(data);
+        //     console.log('tier list data', data);
+        //     setTiers(data.tiers);
+        //     console.log('tiers data', data.tiers);
+        // }).catch(console.error);
+        // fetchInventory(tierListId).then(data => {
+        //     if (Array.isArray(data.contents)) {
+        //         console.log('inventory contents', data.contents);
+        //         setInventoryAPIds(data.contents.map(content => content.api_id));
+        //     } else {
+        //         console.error('Inventory contents data is not an array: ', data.contents);
+        //         setInventoryAPIds([]);
+        //     }
+        // }).catch(error => {
+        //     console.error(error);
+        //     setInventoryAPIds([]);
+        // });
     }, [inventoryAPIds, tiers]);
+
+
+
+    const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
+    async function saveTierList() {
+        await updateInventory(tierList.inventory.id, inventoryAPIds)
+            .catch(console.error);
+        // tiers.forEach(async tier => {
+        //     await updateTier(tier.id, tier.contents)
+        //         .catch(console.error);
+        // });
+    }
 
     const isContentIdInInventory = (contentId) => inventoryAPIds.includes(contentId);
 
@@ -153,8 +187,6 @@ export default function OwnerTierList(tierList, inventoryAPIds, setInventoryAPId
         }
     };
 
-    const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
 
     if (!tierList) return 'Loading...';
 
@@ -164,19 +196,45 @@ export default function OwnerTierList(tierList, inventoryAPIds, setInventoryAPId
                 <NavBar />
                 <div className="container-fluid bg-light pa-3">
                     <div className="row">
-                        <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
+                        <div className='col-12 d-flex justify-content-between flex-column-reverse flex-md-row'>
                             <h1 className="my-2">Create(Build)</h1>
                             <div>
                                 <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
                                 <a className="mx-2 my-2 btn btn-primary" href="/" title='Make your tier list public'>Post</a>
                             </div>
                         </div>
+                        <div className='col-12'>
+                            <div className="form-floating my-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="title"
+                                    defaultValue={tierList.title}
+                                    onChange={handleInputChange}
+                                />
+                                <label htmlFor="title">Title</label>
+                            </div>
+                            <div className="form-floating">
+                                <textarea
+                                    className="form-control"
+                                    id="description"
+                                    rows="3"
+                                    style={{ height: "100%" }}
+                                    defaultValue={tierList.description}
+                                    onChange={handleInputChange}
+                                ></textarea>
+                                <label htmlFor="description">Description(optional)</label>
+                            </div>
+
+                        </div>
                         <div className="col-8">
                             <div><a className="btn btn-primary text-light my-2" href="#">Share</a></div>
                             <div id="ranks" className="row">
                                 {tiers.map((tier, index) => (
                                     <Tier
-                                        key={tier.id} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                                        tier={tier}
+                                        key={tier.id}
+                                        tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
                                     />
                                 ))}
                             </div>

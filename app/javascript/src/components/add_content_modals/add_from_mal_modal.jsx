@@ -8,7 +8,7 @@ import SearchResult from './content_result/search_result';
 import SearchResultImport from './content_result/search_result_import';
 
 
-export default function AddFromMALModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList }) {
+export default function AddFromMALModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList, isApiAlreadyAdded }) {
     const initialStatus = ContentType[tierList.content_type] === ContentType.anime ? AnimeStatus[0] : MangaStatus[0];
 
     const [searchInput, setSearchInput] = useState('');
@@ -46,6 +46,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
         const fetchFunction = ContentType[tierList.content_type] === ContentType.anime ? fetchUserAnimeList : fetchUserMangaList;
         fetchFunction(userName, status)
             .then(data => {
+                console.log('mal user list', data);
                 if (!data || data.length === 0) {
                     setErrorMessage(`User ${userName} not found or user's list is empty.`);
                 } else {
@@ -60,12 +61,20 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
     };
 
     const addAllToInventory = () => {
-        userData.forEach(content => {
-            const id = ContentType[tierList.content_type] === ContentType.character ? content.node.mal_id : content.node.id;
-            if (id) {
-                addContentToInventory(id);
-            }
-        });
+
+        userData.forEach(async content => {
+            const contentNode = content.node;
+            
+            console.log('content', content);
+            const id = ContentType[tierList.content_type] === ContentType.character ? contentNode.mal_id : contentNode.id;
+            const name = contentNode.title
+            const imageUrl = contentNode.main_picture.large
+            console.log('id', id);
+            console.log('name', name);
+            console.log('imageUrl', imageUrl);
+
+            addContentToInventory(id, name, imageUrl);
+        })
     };
 
     return (
@@ -90,6 +99,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
                                         result={ContentType[tierList.content_type] === ContentType.character ? result : result.node}
                                         inventory={inventory}
                                         addContentToInventory={addContentToInventory}
+                                        isApiAlreadyAdded={isApiAlreadyAdded}
                                     />
                                 )
                             }
@@ -127,7 +137,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
                             {isLoading
                                 ? <BeatLoader color="#123abc" loading={isLoading} size={15} />
                                 : userData?.map(result =>
-                                    <SearchResultImport key={result.node.id} result={result.node} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    <SearchResultImport key={result.node.id} result={result.node} inventory={inventory} addContentToInventory={addContentToInventory} isApiAlreadyAdded={isApiAlreadyAdded} />
                                 )}
                         </div>
                     </Tab>

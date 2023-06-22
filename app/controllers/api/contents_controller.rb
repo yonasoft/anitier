@@ -2,6 +2,10 @@ module Api
   class ContentsController < ApplicationController
     before_action :set_content, only: [:show, :update, :destroy]
 
+    def show
+      render json: @content
+    end
+
     def create
       @content = Content.find_or_initialize_by(api_id: content_params[:api_id])
       @content.assign_attributes(content_params.except(:inventory_ids, :tier_ids))
@@ -23,7 +27,16 @@ module Api
       end
     end
 
+    def destroy
+      @content.destroy
+      head :no_content
+    end
+
     private
+
+    def set_content
+      @content = Content.find(params[:id])
+    end
 
     def update_relationships
       @content.inventories.clear
@@ -41,37 +54,7 @@ module Api
     end
 
     def content_params
-      params.require(:content).permit(:api_id, :content_type, :source, inventory_ids: [], tier_ids: [])
-    end
-  end
-end
-
-module Api
-  class InventoriesController < ApplicationController
-    def create
-      @inventory = Inventory.new(inventory_params.except(:content_ids))
-
-      if @inventory.save
-        @inventory.contents << Content.where(id: inventory_params[:content_ids])
-        render json: @inventory, status: :created
-      else
-        render json: @inventory.errors, status: :unprocessable_entity
-      end
-    end
-
-    def update
-      if @inventory.update(inventory_params.except(:content_ids))
-        @inventory.contents = Content.where(id: inventory_params[:content_ids])
-        render json: @inventory
-      else
-        render json: @inventory.errors, status: :unprocessable_entity
-      end
-    end
-
-    private
-
-    def inventory_params
-      params.require(:inventory).permit(:tier_list_id, content_ids: [])
+      params.require(:content).permit(:api_id, :content_type, :source, :name, :image_url, inventory_ids: [], tier_ids: [])
     end
   end
 end

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './create.scss';
 import { Button } from 'react-bootstrap';
-import { fetchTierList, fetchInventory, updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
+import { fetchTierList, fetchInventory, updateInventory, updateTier, createContent, fetchTiersFromTierList, fetchContentModel, } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -10,188 +10,103 @@ import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
 import NavBar from '../components/navbar/navbar';
 
+
 export default function CreateBuild({ tierListId }) {
 
-    const [inventoryAPIds, setInventoryAPIds] = useState([]);
+    const [tierList, setTierList] = useState({});
+    const [inventoryContentIds, setInventoryContentIds] = useState([]);
     const [tiers, setTiers] = useState([]);
+    const [allContentsAsApi, setAllContentsAsApi] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [tierList, setTierList] = useState({
-        source: '',
-        content_type: '',
-    });
 
     useEffect(() => {
         if (tierListId) {
-            fetchTierList(tierListId).then(data => {
+            fetchTierList(tierListId).then(async data => {
                 setTierList(data);
                 console.log('tier list data', data);
-                setTiers(data.tiers);
-                console.log('tiers data', data.tiers);
             }).catch(console.error);
 
             fetchInventory(tierListId).then(data => {
-                if (Array.isArray(data.contents)) {
-                    console.log('inventory contents', data.contents);
-                    setInventoryAPIds(data.contents);
+                if (!data.inventory.content_ids) {
+                    setInventoryContentIds([]);
                 } else {
-                    console.error('Inventory contents data is not an array: ', data.contents);
-                    setInventoryAPIds([]);
+                    console.log('inventory data', data);
+                    setInventoryContentIds(data.content_ids);
                 }
-            }).catch(error => {
-                console.error(error);
-                setInventoryAPIds([]);
+            });
+
+            fetchTiersFromTierList(tierListId).then(data => {
+                setTiers(data);
+                console.log('tiers data', data);
+                const tierContentIds = data.flatMap(tier => tier.content_ids);
+                console.log('tier content ids', tierContentIds);
+                setAllContentsAsApi(prevState => [...prevState, ...tierContentIds]);
+                console.log('tiers data', data);
             });
         }
     }, [tierListId]);
 
     useEffect(() => {
-        updateInventory(tierListId, inventoryAPIds)
-            .catch(console.error);
-        tiers.forEach(tier => {
-            updateTier(tier.id, tier.contents)
-                .catch(console.error);
+        if (inventoryContentIds) {
+            updateInventory(tierListId, inventoryContentIds)
+                .then(updatedInventory => {
+                    console.log("Updated inventory:", updatedInventory);
+                })
+                .catch(error => {
+                    console.error("Error updating inventory:", error);
+                });
+        }
+    }, [inventoryContentIds, tierListId]);
+
+    useEffect(() => {
+        tiers && tiers.forEach(tier => {
+            updateTier(tier.id, tier.contents).then(data => {
+                console.log('tier data updated', data);
+            }).catch(console.error);
         });
-    }, [inventoryAPIds, tiers]);
+    }, [tiers]);
 
-    const isContentIdInInventory = (contentId) => inventoryAPIds.includes(contentId);
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
-    const addContentToInventory = (contentId) => {
-        if (!isContentIdInInventory(contentId)) {
-            setInventoryAPIds(prevInventory => [...prevInventory, contentId]);
+    const isApiAlreadyAdded = (apiId) => {
+        console.log('Checking if apiId is already added:', apiId);
+        console.log('allContentsAsApi:', allContentsAsApi);
+        if (!allContentsAsApi) return false;
+        return allContentsAsApi.includes(apiId);
+    };
+
+    const createContentAndUpdateInventory = async (apiId, name, imageUrl) => {
+        try {
+            const contentId = await createContent(apiId, name, imageUrl);
+            console.log('content id to add', contentId);
+
+            setInventoryContentIds(prevInventoryContentIds => [...(prevInventoryContentIds || []), contentId]);
+
+            setAllContentsAsApi(prevApiIds => {
+                const newApiIds = [...(prevApiIds || []), apiId];
+                console.log('Updated allContentsAsApi:', newApiIds);
+                return newApiIds;
+            });
+
+            console.log("Content added to the inventory successfully.");
+
+        } catch (error) {
+            console.error("Error adding content to inventory:", error);
         }
-    }
-
-    const updateTierState = (tier, sourceIndex, destinationIndex, draggableId) => {
-        console.log('tier in updateTier', tier);
-        const copy = Array.from(tier.contents);
-
-        // If sourceIndex is not null, we're moving an item from it
-        if (sourceIndex !== null) {
-            copy.splice(sourceIndex, 1);
-        }
-
-        // If destinationIndex is not null, we're adding an item to it
-        if (destinationIndex !== null) {
-            copy.splice(destinationIndex, 0, parseInt(draggableId));
-        }
-
-        return {
-            ...tier,
-            contents: copy,
-        };
     };
 
 
     const onDragEnd = (result) => {
-        const { destination, source, draggableId } = result;
 
-        if (!destination) {
-            return;
-        }
-
-        if (source.droppableId === destination.droppableId && source.index === destination.index) {
-            return;
-        }
-
-        console.log("source:", source);
-        console.log("destination:", destination);
-        console.log("tiers:", tiers);
-
-
-        if (source.droppableId === 'inventory') {
-            const start = inventoryAPIds;
-            const finish = tiers[parseInt(destination.droppableId)];
-
-            const startCopy = Array.from(start);
-            const finishCopy = Array.from(finish.contents);
-
-            console.log('draggable id', draggableId);
-            startCopy.splice(source.index, 1);
-            finishCopy.splice(destination.index, 0, parseInt(draggableId));
-
-            setInventoryAPIds([...startCopy]);
-
-            const newTier = {
-                ...finish,
-                contents: finishCopy
-            };
-
-            const newTiers = [...tiers];
-            newTiers[parseInt(destination.droppableId)] = newTier;
-
-            setTiers(newTiers);
-        }
-        else {
-            const start = tiers[parseInt(source.droppableId)];
-            const finish = tiers[parseInt(destination.droppableId)];
-
-            if (start === finish) {
-                const startCopy = Array.from(start.contents);
-                console.log('draggable id', draggableId);
-                startCopy.splice(source.index, 1);
-                startCopy.splice(destination.index, 0, parseInt(draggableId));
-
-                const newTier = {
-                    ...start,
-                    contents: startCopy
-                };
-
-                const newTiers = [...tiers];
-                newTiers[parseInt(source.droppableId)] = newTier;
-
-                setTiers(newTiers);
-            }
-            if (destination.droppableId === 'inventory') {
-                const start = tiers[parseInt(source.droppableId)];
-                const startCopy = Array.from(start.contents);
-
-                console.log('draggable id', draggableId);
-                startCopy.splice(source.index, 1);
-
-                const newTier = {
-                    ...start,
-                    contents: startCopy
-                };
-
-                const newTiers = [...tiers];
-                newTiers[parseInt(source.droppableId)] = newTier;
-
-                setTiers(newTiers);
-
-                const inventoryCopy = Array.from(inventoryAPIds);
-                inventoryCopy.splice(destination.index, 0, parseInt(draggableId));
-                setInventoryAPIds(inventoryCopy);
-            } else {
-                const start = tiers[parseInt(source.droppableId)];
-                const finish = tiers[parseInt(destination.droppableId)];
-
-                if (start === finish) {
-                    console.log('draggable id', draggableId);
-                    const newTier = updateTierState(start, source.index, destination.index, draggableId);
-                    const newTiers = [...tiers];
-                    newTiers[parseInt(source.droppableId)] = newTier;
-                    setTiers(newTiers);
-                } else {
-                    console.log('draggable id', draggableId);
-                    const newStart = updateTierState(start, source.index, null, draggableId);
-                    const newFinish = updateTierState(finish, null, destination.index, draggableId);
-                    const newTiers = [...tiers];
-                    newTiers[parseInt(source.droppableId)] = newStart;
-                    newTiers[parseInt(destination.droppableId)] = newFinish;
-                    setTiers(newTiers);
-                }
-            }
-        }
     };
 
-    const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
 
     if (!tierList) return 'Loading...';
 
     return (
         <React.Fragment>
-            <DragDropContext onDragEnd={result => onDragEnd(result)}>
+            <DragDropContext onDragEnd={result => console.log(result)}>
                 <NavBar />
                 <div className="container-fluid bg-light pa-3">
                     <div className="row">
@@ -205,7 +120,7 @@ export default function CreateBuild({ tierListId }) {
                         <div className="col-8">
                             <div><a className="btn btn-primary text-light my-2" href="#">Share</a></div>
                             <div id="ranks" className="row">
-                                {tiers.map((tier, index) => (
+                                {tiers && tiers.map((tier, index) => (
                                     <Tier
                                         key={tier.id} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
                                     />
@@ -217,25 +132,29 @@ export default function CreateBuild({ tierListId }) {
                                 <h3 className="my-2">Inventory</h3>
                                 <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                             </div>
-                            <Inventory inventoryIds={inventoryAPIds} setInventoeryIds={setInventoryAPIds} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+                            <Inventory inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+
                             {tierList.source === 'anilist' && (
                                 <AddFromAniListModal
                                     tierList={tierList}
                                     showModal={showModal}
                                     handleCloseModal={handleCloseModal}
                                     contentType={ContentType[tierList.content_type]}
-                                    inventory={inventoryAPIds}
-                                    addContentToInventory={addContentToInventory}
+                                    inventoryContent={inventoryContentIds}
+                                    addContentToInventory={createContentAndUpdateInventory}
+                                    isApiAlreadyAdded={isApiAlreadyAdded}
                                 />
                             )}
+
                             {tierList.source === 'mal' && (
                                 <AddFromMALModal
                                     tierList={tierList}
                                     showModal={showModal}
                                     handleCloseModal={handleCloseModal}
                                     contentType={ContentType[tierList.content_type]}
-                                    inventory={inventoryAPIds}
-                                    addContentToInventory={addContentToInventory}
+                                    inventoryContent={inventoryContentIds}
+                                    addContentToInventory={createContentAndUpdateInventory}
+                                    isApiAlreadyAdded={isApiAlreadyAdded}
                                 />
                             )}
                         </div>

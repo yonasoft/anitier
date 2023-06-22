@@ -43,7 +43,15 @@ export async function fetchTierList(id) {
     }
 
     const responseData = await response.json();
-    return { ...responseData, tiers: responseData.tiers };
+
+    return {
+        ...responseData,
+        inventory: responseData.inventory,
+        tiers: responseData.tiers.map(tier => ({
+            ...tier,
+            contents: tier.contents
+        }))
+    };
 }
 
 export async function updateTierList(id, updatedData) {
@@ -55,7 +63,7 @@ export async function updateTierList(id, updatedData) {
         },
         body: JSON.stringify({
             tier_list: {
-                ...updatedData
+                ...updatedData,
             }
         })
     });
@@ -216,13 +224,22 @@ export async function postTier(tier, tierListId, contentIds = []) {
     return await response.json();
 }
 
-export async function updateTier(tierId, contentApiIds = []) {
-    const contentIds = [];
-    for (const id of contentApiIds) {
-        const newContent = await createContent(id);
-        contentIds.push(newContent.id);
-    }
 
+export async function fetchTiersFromTierList(tierListId) {
+    const response = await fetch(`/api/tier_lists/${tierListId}/tiers`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Error fetching tiers from tier list: ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+export async function updateTier(tierId, contentIds = []) {
     const response = await fetch(`/api/tiers/${tierId}`, {
         method: 'PATCH',
         headers: {
@@ -237,10 +254,12 @@ export async function updateTier(tierId, contentApiIds = []) {
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Error updating tier: ${response.statusText}`);
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    responseData.tier.content_ids = responseData.tier.content_ids || [];
+    return responseData;
 }
 
 export async function fetchInventory(inventoryId) {
@@ -256,19 +275,15 @@ export async function fetchInventory(inventoryId) {
         throw new Error(`Error fetching inventory: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
-    console.log(`Fetched Inventory: ${JSON.stringify(responseData)}`)
+    let responseData = await response.json();
+    responseData = responseData || {};
+    responseData.content_ids = responseData.content_ids || [];
+
     return responseData;
 }
 
 
-export async function updateInventory(inventoryId, contentApiIds = []) {
-    const contentIds = [];
-    for (const id of contentApiIds) {
-        const newContent = await createContent(id);
-        contentIds.push(newContent.id);
-    }
-
+export async function updateInventory(inventoryId, contentIds = []) {
     const response = await fetch(`/api/inventories/${inventoryId}`, {
         method: 'PATCH',
         headers: {
@@ -283,73 +298,69 @@ export async function updateInventory(inventoryId, contentApiIds = []) {
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Error updating inventory: ${response.statusText}`);
     }
 
-    return await response.json();
+    let responseData = await response.json();
+
+    if (responseData) {
+        responseData.content_ids = responseData.content_ids || [];
+    } else {
+        console.error('Inventory is undefined in the response');
+    }
+
+    console.log('Update INV RESPONSE DATA', JSON.stringify(responseData));
+    return responseData;
 }
 
-export async function createContent(contentApiId, inventoryIds = [], tierIds = []) {
-    // Fetch the content using the contentApiId
-    let contentResponse = await fetch(`/api/contents/${contentApiId}`, {
+
+export async function fetchContentModel(contentId) {
+    const response = await fetch(`/api/contents/${contentId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-Token': token
         },
     });
-
-    if (contentResponse.ok) {
-        // If the content already exists, update it
-        let responseData = await contentResponse.json();
-        let existingInventoryIds = responseData.inventory_ids || [];
-        let existingTierIds = responseData.tier_ids || [];
-
-        let response = await fetch(`/api/contents/${responseData.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': token
-            },
-            body: JSON.stringify({
-                content: {
-                    inventory_ids: [...existingInventoryIds, ...inventoryIds],
-                    tier_ids: [...existingTierIds, ...tierIds]
-                }
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error updating content: ${response.statusText}`);
-        }
-
-        responseData = await response.json();
-        return responseData;
-    } else {
-        // If the content does not exist, create it
-        let response = await fetch('/api/contents', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': token
-            },
-            body: JSON.stringify({
-                content: {
-                    api_id: contentApiId,
-                    inventory_ids: inventoryIds,
-                    tier_ids: tierIds
-                }
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error creating content: ${response.statusText}`);
-        }
-
-        let responseData = await response.json();
-        return responseData;
+    if (!response.ok) {
+        throw new Error(`Error fetching content: ${response.statusText}`);
     }
+    const data = await response.json();
+    console.log(`Data for contentId ${contentId}: `, data);
+    return data;
 }
+
+export async function createContent(api_id, name, imageUrl) {
+    const response = await fetch('/api/contents', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+        body: JSON.stringify({
+            content: {
+                api_id: api_id,
+                name: name,
+                image_url: imageUrl,
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    console.log('content added', JSON.stringify(responseData));
+
+    return responseData.id;
+}
+
+
+
+
+
 
 
 

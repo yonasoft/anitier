@@ -1,6 +1,6 @@
 module Api
   class TierListsController < ApplicationController
-    before_action :set_tier_list, only: %i(show update destroy inventory)
+     before_action :set_tier_list, only: [:show, :update, :destroy, :tiers]
     
     def index
       @tier_lists = TierList.all
@@ -8,7 +8,15 @@ module Api
     end
 
     def show
-      render json: @tier_list.as_json(include: { tiers: { include: :contents }, inventory: {}, user: {} })
+      render json: @tier_list.as_json(include: { tiers: { }, inventory: { }, user: {} })
+    end
+
+    def update
+      if @tier_list.update(tier_list_params)
+        render json: @tier_list.as_json(include: { tiers: {  }, inventory: { methods:  } })
+      else
+        render json: { errors: @tier_list.errors }, status: :unprocessable_entity
+      end
     end
 
     def inventory
@@ -23,14 +31,6 @@ module Api
       else
         Rails.logger.error("TierList validation failed: #{tier_list.errors.full_messages}")
         render json: { error: tier_list.errors }, status: :unprocessable_entity
-      end
-    end
-
-    def update
-      if @tier_list.update(tier_list_params)
-        render json: @tier_list.as_json(include: :inventory)
-      else
-        render json: { errors: @tier_list.errors }, status: :unprocessable_entity
       end
     end
 
@@ -71,6 +71,10 @@ module Api
       render json: @tier_lists
     end
 
+    def tiers
+      render json: @tier_list.tiers
+    end
+    
     private
 
     def set_tier_list

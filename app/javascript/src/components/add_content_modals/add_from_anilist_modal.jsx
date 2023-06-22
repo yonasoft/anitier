@@ -7,7 +7,7 @@ import './add_modal.scss';
 import SearchResultImport from './content_result/search_result_import';
 import SearchResult from './content_result/search_result';
 
-export default function AddFromAniListModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList }) {
+export default function AddFromAniListModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList, isApiAlreadyAdded }) {
 
     // State Initialization
     const [searchInput, setSearchInput] = useState('');
@@ -43,6 +43,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                     setErrorMessage(`User ${userName} not found or user's list is empty.`);
                 } else {
                     setUserData(data);
+                    console.log('user data', data);
                 }
             })
             .catch(error => {
@@ -51,15 +52,32 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
             });
     }
 
-    const addAllToInventory = () => {
-        userData.forEach(list => {
-            list.entries.forEach(content => {
+    const addAllToInventory = async () => {
+        const promises = [];
+
+        for (const list of userData) {
+            for (const content of list.entries) {
+                console.log('content', content);
                 if (content.media) {
-                    addContentToInventory(content.media.id);
+                    const id = content.media.id;
+                    const image = (content.media.main_picture?.large || content.media.coverImage?.large || content.media.main_picture?.medium || content.media.image.large || content.media.image || content.media.images.jpg.image_url);
+                    const name = content.media.title?.english || content.media.title?.romaji || content.media?.title || (content.media.name?.first ? `${content.media.name.first} ${content.media.name.last}` : content.media.name);
+                    promises.push(addContentToInventory(id, name, image));
                 }
-            });
-        });
+            }
+        }
+
+        const results = await Promise.allSettled(promises);
+
+        // Check for failures and handle them as needed
+        for (const result of results) {
+            if (result.status === 'rejected') {
+                console.error("Error adding content to inventory:", result.reason);
+            }
+        }
     }
+
+
 
     return (
         <Modal show={showModal} onHide={handleCloseModal} size="xl" className="my-modal">
@@ -76,7 +94,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                         <div className="scrollable-results py-2 w-100 h-80">
                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
                                 searchResults.map(result =>
-                                    <SearchResult key={result.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    <SearchResult key={result.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} isApiAlreadyAdded={isApiAlreadyAdded} />
                                 )
                             }
                         </div>
@@ -112,7 +130,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                         <div className="scrollable-results py-2 w-100 h-80">
                             {userData.map(list =>
                                 list.entries.map(result =>
-                                    result.media && <SearchResultImport key={result.media.id} result={result.media} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} />
+                                    result.media && <SearchResultImport key={result.media.id} result={result.media} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} isApiAlreadyAdded={isApiAlreadyAdded} />
                                 )
                             )}
                         </div>

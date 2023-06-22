@@ -8,7 +8,18 @@ module Api
     end
 
     def show
-      render json: @tier
+      content_ids = @tier.contents.pluck(:id)
+      render json: @tier.attributes.merge(content_ids: content_ids)
+    end
+
+    def update
+      if @tier.update(tier_params.except(:content_ids))
+        @tier.contents = Content.where(id: tier_params[:content_ids])
+        content_ids = @tier.contents.pluck(:id)
+        render json: { tier: @tier.attributes.merge(content_ids: content_ids) }
+      else
+        render json: @tier.errors, status: :unprocessable_entity
+      end
     end
 
     def create
@@ -22,21 +33,13 @@ module Api
       end
     end
 
-    def update
-      @tier = Tier.find(params[:id])
-
-      if @tier.update(tier_params.except(:content_ids))
-        @tier.contents = Content.where(id: tier_params[:content_ids])
-        render json: @tier
-      else
-        render json: @tier.errors, status: :unprocessable_entity
-      end
-    end
-
     def destroy
       @tier.destroy
     end
 
+    def content_ids
+      contents.pluck(:id)
+    end
     private
 
     def set_tier

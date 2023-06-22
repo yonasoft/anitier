@@ -18,7 +18,9 @@ class StaticPagesController < ApplicationController
   end
 
   def tier_list
-    @tier_list_id = params[:id]
+
+    @data = { tier_list_id: params[:id] }.to_json
+    render 'tier_list'
   end
 
   def templates

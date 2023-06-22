@@ -19,9 +19,14 @@ Rails.application.routes.draw do
     get '/fetch_user_anime_list', to: 'mal_api#fetch_user_anime_list'
     get '/fetch_user_manga_list', to: 'mal_api#fetch_user_manga_list'
     resources :users, only: [:create]
+    resources :tiers
+    resources :inventories, only: [:show, :update]
+    resources :template_tier_lists
+    resources :contents, only: [:show, :create, :destroy]
     resources :tier_lists do
-      resource :inventory, only: [:show]
-
+      member do
+        get 'tiers'
+      end
       collection do
         get 'recent'
         get 'popular'
@@ -35,15 +40,8 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :tiers
-    resources :inventories, only: [:show, :update]
-
     match 'user/:user_id', to: 'tier_lists#user_lists', via: :get
     match 'user/:user_id/posted', to: 'tier_lists#posted_user_lists', via: :get
     match 'user/:user_id/unposted', to: 'tier_lists#unposted_user_lists', via: :get
-
-    resources :template_tier_lists
-    resource :inventory, only: [:show, :update]
-    resources :contents
   end
 end
