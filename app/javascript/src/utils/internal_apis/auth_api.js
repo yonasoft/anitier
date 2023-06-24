@@ -62,7 +62,7 @@ export const login = async (username, password) => {
 };
 
 
-export const logout = async () => {
+export const apiLogout = async () => {
     const response = await fetch("/api/logout", {
         method: 'DELETE',
         headers: {

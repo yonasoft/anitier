@@ -1,4 +1,3 @@
-// home.jsx
 import React, { useState } from 'react';
 import './activity.scss';
 import NavBar from '../components/navbar/navbar'

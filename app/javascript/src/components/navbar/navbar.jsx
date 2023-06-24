@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
-import { fetchUserState, logout } from '../../utils/internal_apis/auth_api'; import { Button } from 'react-bootstrap';
+import { fetchUserState, apiLogout } from '../../utils/internal_apis/auth_api';
+import { Button } from 'react-bootstrap';
 ;
 
 export default function NavBar() {
@@ -19,14 +20,16 @@ export default function NavBar() {
   }, []);
 
   const handleLogout = async () => {
+    console.log('Logout button clicked');
     try {
-      await logout();
+      await apiLogout();
       setLoggedIn(false);
       setUsername("");
     } catch (error) {
       console.error('Error:', error);
     }
   }
+
 
   return (
     <nav className="navbar navbar-expand shadow p-3">
