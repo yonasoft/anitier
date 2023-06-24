@@ -7,6 +7,7 @@ import { fetchUserState } from '../utils/internal_apis/auth_api';
 export default function CreateSetup({ nextStep }) {
 
     const [userState, setUserState] = useState({});
+    const [loggedIn, setLoggedIn] = useState(false);
     const [newTier, setNewTier] = useState('');
     const [tiers, setTiers] = useState([
         { rank: 'S', content_ids: [] },
@@ -15,13 +16,15 @@ export default function CreateSetup({ nextStep }) {
         { rank: 'C', content_ids: [] },
         { rank: 'D', content_ids: [] },
     ]);
+    const [showError, setShowError] = useState(false);
+
 
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
         source: 0,  // use the string key here
         content_type: 0,  // and here
-        user_id: userId,
+        user_id: userState.user_id,
         upvotes: 0,
         downvotes: 0,
     });
@@ -29,10 +32,19 @@ export default function CreateSetup({ nextStep }) {
 
     useEffect(() => {
         fetchUserState().then(userState => {
-            setUserId(userState);
+            setUserState(userState);
+            setLoggedIn(userState.logged_in)
             setTierList(prevState => ({ ...prevState, user_id: userState.user_id }));
         }).catch(error => console.error(error));
     }, []);
+
+    useEffect(() => {
+        if (loggedIn) {
+            setShowError(false);
+        } else {
+            setShowError(true);
+        }
+    }, [loggedIn])
 
     const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
     const handleSelectChange = (event) => { setTierList({ ...tierList, [event.target.id]: parseInt(event.target.value) }); }
@@ -51,38 +63,38 @@ export default function CreateSetup({ nextStep }) {
     }
 
     const saveTierList = async () => {
-        if (userState.logged_in) {
-            try {
-                const tierListResponse = await postTierList(tierList);
-                console.log('tierListResponse:', tierListResponse);
+        try {
+            const tierListResponse = await postTierList(tierList);
+            console.log('tierListResponse:', tierListResponse);
 
-                const tierListId = tierListResponse.tier_list.id;  // Extracting the tierListId from the response
+            const tierListId = tierListResponse.tier_list.id;  // Extracting the tierListId from the response
 
-                for (const tier of tiers) {
-                    const tierResponse = await postTier(tier, tierListId);
-                    console.log(tierResponse);
-                }
-
-                nextStep(tierListId);
-            } catch (error) {
-                console.error(error);
+            for (const tier of tiers) {
+                const tierResponse = await postTier(tier, tierListId);
+                console.log(tierResponse);
             }
-        } else {
-            <div class="alert alert-danger" role="alert">
-                This is a danger alert—check it out!
-            </div>
+
+            nextStep(tierListId);
+        } catch (error) {
+            console.error(error);
         }
+
     };
 
     return (
         <React.Fragment>
             <NavBar />
-            <div className="container-fluid bg-light pa-3">
+            <div className="container bg-light pa-3">
                 <div className="row align-items-center">
                     <h1 className="col">Create (Setup)</h1>
+                    {showError &&
+                        <div className="alert alert-danger" role="alert">
+                            Must be logged in to create tier list!
+                        </div>
+                    }
                     <div className="col-auto d-flex justify-content-end">
                         <a className="btn btn-secondary text-light mb-auto mx-2" href="/">Cancel</a>
-                        <button className="btn btn-primary text-light mb-auto ml-2 mx-2" onClick={saveTierList}>Next</button>
+                        <button className="btn btn-primary text-light mb-auto ml-2 mx-2" disabled={!loggedIn} onClick={saveTierList}>Next</button>
                     </div>
                 </div>
                 <div className="row">
