@@ -224,7 +224,7 @@ export default function CreateBuild({ tierListId }) {
         <React.Fragment>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <NavBar />
-                <div className="container-fluid bg-light pa-3">
+                <div className="container bg-light pa-3">
                     <div className="row">
                         <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                             <h1 className="my-2">Create(Build)</h1>
