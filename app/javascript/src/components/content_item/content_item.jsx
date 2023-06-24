@@ -12,7 +12,7 @@ export default function ContentItem({ id, item, index }) {
     const name = item.name;
 
     return (
-        <Draggable key={id} draggableId={id ? id.toString() : "0"} index={index}>
+        <Draggable key={id} draggableId={item.id ? item.id.toString() : "0"} index={index}>
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}

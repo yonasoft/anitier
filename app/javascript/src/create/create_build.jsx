@@ -97,60 +97,24 @@ export default function CreateBuild({ tierListId }) {
         }
     };
 
-    async function moveToSameTier(source, destination, draggableId) {
-        let sourceTier = tiers[source.droppableId];
-        sourceTier.content_ids.splice(source.index, 1);
-        sourceTier.content_ids.splice(destination.index, 0, draggableId);
 
-        let updatedTiers = tiers.map((tier, index) => index.toString() === source.droppableId ? sourceTier : tier);
-        setTiers(updatedTiers);
-    }
+    const adjustTier = (tier, sourceIndex, destinationIndex, draggableId) => {
+        console.log('tier in updateTier', tier);
+        const copy = Array.from(tier.content_ids);
 
-    async function moveToDifferentTier(source, destination, draggableId) {
-        let sourceTier = tiers[source.droppableId];
-        let destinationTier = tiers[destination.droppableId];
-        sourceTier.content_ids.splice(source.index, 1);
-        destinationTier.content_ids.splice(destination.index, 0, draggableId);
+        if (sourceIndex !== null) {
+            copy.splice(sourceIndex, 1);
+        }
 
-        let updatedTiers = tiers.map((tier, index) => {
-            if (index.toString() === source.droppableId) return sourceTier;
-            if (index.toString() === destination.droppableId) return destinationTier;
-            return tier;
-        });
-        setTiers(updatedTiers);
-    }
+        if (destinationIndex !== null) {
+            copy.splice(destinationIndex, 0, parseInt(draggableId));
+        }
 
-    async function moveToInventory(source, destination, draggableId) {
-        let sourceTier = tiers[source.droppableId];
-        sourceTier.content_ids.splice(source.index, 1);
-
-        let updatedTiers = tiers.map((tier, index) => index.toString() === source.droppableId ? sourceTier : tier);
-        setTiers(updatedTiers);
-
-        let updatedInventory = [...inventoryContentIds, draggableId];
-        setInventoryContentIds(updatedInventory);
-    }
-
-    async function moveFromInventory(source, destination, draggableId) {
-        let newInventoryContentIds = [...inventoryContentIds];
-        newInventoryContentIds.splice(source.index, 1);
-        setInventoryContentIds(newInventoryContentIds);
-
-        let destinationTier = tiers[destination.droppableId];
-        let updatedDestinationTier = {
-            ...destinationTier,
-            content_ids: [
-                ...destinationTier.content_ids.slice(0, destination.index),
-                draggableId,
-                ...destinationTier.content_ids.slice(destination.index)
-            ]
+        return {
+            ...tier,
+            content_ids: copy,
         };
-
-        let updatedTiers = tiers.map((tier, index) => index.toString() === destination.droppableId ? updatedDestinationTier : tier);
-
-        // No state update here
-        return updatedTiers; // Returning the updated tiers
-    }
+    };
 
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
@@ -166,7 +130,6 @@ export default function CreateBuild({ tierListId }) {
         console.log("source:", source);
         console.log("destination:", destination);
         console.log("tiers:", tiers);
-
 
         if (source.droppableId === 'inventory') {
             const start = inventoryContentIds;
@@ -237,14 +200,14 @@ export default function CreateBuild({ tierListId }) {
 
                 if (start === finish) {
                     console.log('draggable id', draggableId);
-                    const newTier = updateTier(start, source.index, destination.index, draggableId);
+                    const newTier = adjustTier(start, source.index, destination.index, draggableId);
                     const newTiers = [...tiers];
                     newTiers[parseInt(source.droppableId)] = newTier;
                     setTiers(newTiers);
                 } else {
                     console.log('draggable id', draggableId);
-                    const newStart = updateTier(start, source.index, null, draggableId);
-                    const newFinish = updateTier(finish, null, destination.index, draggableId);
+                    const newStart = adjustTier(start, source.index, null, draggableId);
+                    const newFinish = adjustTier(finish, null, destination.index, draggableId); // Note the change from 'ajustTier' to 'adjustTier' here
                     const newTiers = [...tiers];
                     newTiers[parseInt(source.droppableId)] = newStart;
                     newTiers[parseInt(destination.droppableId)] = newFinish;
@@ -253,6 +216,7 @@ export default function CreateBuild({ tierListId }) {
             }
         }
     };
+
 
     if (!tierList) return 'Loading...';
 
