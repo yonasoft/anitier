@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './create.scss';
 import { Button } from 'react-bootstrap';
-import { fetchTierList, fetchInventory, updateInventory, updateTier, createContent, fetchTiersFromTierList, fetchContentModel, } from '../utils/internal_apis/tierlist_apis';
+import { fetchTierList, fetchInventory, updateInventory, updateTier, createContent, fetchTiersFromTierList, f } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -60,7 +60,8 @@ export default function CreateBuild({ tierListId }) {
 
     useEffect(() => {
         tiers && tiers.forEach(tier => {
-            updateTier(tier.id, tier.contents).then(data => {
+            console.log('tier id when updated and content ids', tier.id, tier.content_ids);
+            updateTier(tier.id, tier.content_ids).then(data => {
                 console.log('tier data updated', data);
             }).catch(console.error);
         });
@@ -96,6 +97,60 @@ export default function CreateBuild({ tierListId }) {
         }
     };
 
+    async function moveToSameTier(source, destination, draggableId) {
+        let sourceTier = tiers[source.droppableId];
+        sourceTier.content_ids.splice(source.index, 1);
+        sourceTier.content_ids.splice(destination.index, 0, draggableId);
+
+        let updatedTiers = tiers.map((tier, index) => index.toString() === source.droppableId ? sourceTier : tier);
+        setTiers(updatedTiers);
+    }
+
+    async function moveToDifferentTier(source, destination, draggableId) {
+        let sourceTier = tiers[source.droppableId];
+        let destinationTier = tiers[destination.droppableId];
+        sourceTier.content_ids.splice(source.index, 1);
+        destinationTier.content_ids.splice(destination.index, 0, draggableId);
+
+        let updatedTiers = tiers.map((tier, index) => {
+            if (index.toString() === source.droppableId) return sourceTier;
+            if (index.toString() === destination.droppableId) return destinationTier;
+            return tier;
+        });
+        setTiers(updatedTiers);
+    }
+
+    async function moveToInventory(source, destination, draggableId) {
+        let sourceTier = tiers[source.droppableId];
+        sourceTier.content_ids.splice(source.index, 1);
+
+        let updatedTiers = tiers.map((tier, index) => index.toString() === source.droppableId ? sourceTier : tier);
+        setTiers(updatedTiers);
+
+        let updatedInventory = [...inventoryContentIds, draggableId];
+        setInventoryContentIds(updatedInventory);
+    }
+
+    async function moveFromInventory(source, destination, draggableId) {
+        let newInventoryContentIds = [...inventoryContentIds];
+        newInventoryContentIds.splice(source.index, 1);
+        setInventoryContentIds(newInventoryContentIds);
+
+        let destinationTier = tiers[destination.droppableId];
+        let updatedDestinationTier = {
+            ...destinationTier,
+            content_ids: [
+                ...destinationTier.content_ids.slice(0, destination.index),
+                draggableId,
+                ...destinationTier.content_ids.slice(destination.index)
+            ]
+        };
+
+        let updatedTiers = tiers.map((tier, index) => index.toString() === destination.droppableId ? updatedDestinationTier : tier);
+
+        // No state update here
+        return updatedTiers; // Returning the updated tiers
+    }
 
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
@@ -104,53 +159,100 @@ export default function CreateBuild({ tierListId }) {
             return;
         }
 
-        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+        if (source.droppableId === destination.droppableId && source.index === destination.index) {
             return;
         }
 
-        const start = source.droppableId === 'inventory' ? inventory : tiers[source.droppableId];
-        const finish = destination.droppableId === 'inventory' ? inventory : tiers[destination.droppableId];
+        console.log("source:", source);
+        console.log("destination:", destination);
+        console.log("tiers:", tiers);
 
-        // Moving within the same list
-        if (start === finish) {
-            const newList = Array.from(start.content_ids);
-            newList.splice(source.index, 1);
-            newList.splice(destination.index, 0, draggableId);
 
-            if (start === inventory) {
-                setInventory({ ...inventory, content_ids: newList });
-            } else {
-                setTiers(prevState => prevState.map(tier => tier.id === start.id ? { ...tier, content_ids: newList } : tier));
+        if (source.droppableId === 'inventory') {
+            const start = inventoryContentIds;
+            const finish = tiers[parseInt(destination.droppableId)];
+
+            const startCopy = Array.from(start);
+            const finishCopy = Array.from(finish.content_ids);
+
+            console.log('draggable id', draggableId);
+            startCopy.splice(source.index, 1);
+            finishCopy.splice(destination.index, 0, parseInt(draggableId));
+
+            setInventoryContentIds([...startCopy]);
+
+            const newTier = {
+                ...finish,
+                content_ids: finishCopy
+            };
+
+            const newTiers = [...tiers];
+            newTiers[parseInt(destination.droppableId)] = newTier;
+
+            setTiers(newTiers);
+        }
+        else {
+            const start = tiers[parseInt(source.droppableId)];
+            const finish = tiers[parseInt(destination.droppableId)];
+
+            if (start === finish) {
+                const startCopy = Array.from(start.content_ids);
+                console.log('draggable id', draggableId);
+                startCopy.splice(source.index, 1);
+                startCopy.splice(destination.index, 0, parseInt(draggableId));
+
+                const newTier = {
+                    ...start,
+                    content_ids: startCopy
+                };
+
+                const newTiers = [...tiers];
+                newTiers[parseInt(source.droppableId)] = newTier;
+
+                setTiers(newTiers);
             }
-        } else {
-            // Moving from one list to another
-            const startList = Array.from(start.content_ids);
-            startList.splice(source.index, 1);
-            const finishList = Array.from(finish.content_ids);
-            finishList.splice(destination.index, 0, draggableId);
+            if (destination.droppableId === 'inventory') {
+                const start = tiers[parseInt(source.droppableId)];
+                const startCopy = Array.from(start.content_ids);
 
-            if (start === inventory) {
-                setInventory({ ...inventory, content_ids: startList });
-                setTiers(prevState => prevState.map(tier => tier.id === finish.id ? { ...tier, content_ids: finishList } : tier));
-            } else if (finish === inventory) {
-                setTiers(prevState => prevState.map(tier => tier.id === start.id ? { ...tier, content_ids: startList } : tier));
-                setInventory({ ...inventory, content_ids: finishList });
+                console.log('draggable id', draggableId);
+                startCopy.splice(source.index, 1);
+
+                const newTier = {
+                    ...start,
+                    content_ids: startCopy
+                };
+
+                const newTiers = [...tiers];
+                newTiers[parseInt(source.droppableId)] = newTier;
+
+                setTiers(newTiers);
+
+                const inventoryCopy = Array.from(inventoryContentIds);
+                inventoryCopy.splice(destination.index, 0, parseInt(draggableId));
+                setInventoryContentIds(inventoryCopy);
             } else {
-                setTiers(prevState => {
-                    return prevState.map(tier => {
-                        if (tier.id === start.id) {
-                            return { ...tier, content_ids: startList };
-                        } else if (tier.id === finish.id) {
-                            return { ...tier, content_ids: finishList };
-                        } else {
-                            return tier;
-                        }
-                    });
-                });
+                const start = tiers[parseInt(source.droppableId)];
+                const finish = tiers[parseInt(destination.droppableId)];
+
+                if (start === finish) {
+                    console.log('draggable id', draggableId);
+                    const newTier = updateTier(start, source.index, destination.index, draggableId);
+                    const newTiers = [...tiers];
+                    newTiers[parseInt(source.droppableId)] = newTier;
+                    setTiers(newTiers);
+                } else {
+                    console.log('draggable id', draggableId);
+                    const newStart = updateTier(start, source.index, null, draggableId);
+                    const newFinish = updateTier(finish, null, destination.index, draggableId);
+                    const newTiers = [...tiers];
+                    newTiers[parseInt(source.droppableId)] = newStart;
+                    newTiers[parseInt(destination.droppableId)] = newFinish;
+                    setTiers(newTiers);
+                }
             }
         }
     };
-
 
     if (!tierList) return 'Loading...';
 
@@ -172,7 +274,7 @@ export default function CreateBuild({ tierListId }) {
                             <div id="ranks" className="row">
                                 {tiers && tiers.map((tier, index) => (
                                     <Tier
-                                        key={tier.id} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                                        key={index} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
                                     />
                                 ))}
                             </div>

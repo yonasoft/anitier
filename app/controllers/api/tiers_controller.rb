@@ -3,12 +3,12 @@ module Api
     before_action :set_tier, only: [:show, :update, :destroy]
 
     def index
-      @tiers = Tier.all
-      render json: @tiers
+      @tiers = Tier.where(tier_list_id: params[:tier_list_id])
+      render json: @tiers.map { |tier| tier.attributes.merge(content_ids: tier.contents.present? ? tier.contents.pluck(:id) : []) }
     end
 
     def show
-      content_ids = @tier.contents.pluck(:id)
+      content_ids = @tier.contents.present? ? @tier.contents.pluck(:id) : []
       render json: @tier.attributes.merge(content_ids: content_ids)
     end
 
@@ -27,7 +27,7 @@ module Api
 
       if @tier.save
         @tier.contents = Content.where(id: tier_params[:content_ids])
-        render json: @tier, status: :created
+        render json: @tier.attributes.merge(content_ids: @tier.contents.pluck(:id)), status: :created
       else
         render json: @tier.errors, status: :unprocessable_entity
       end
@@ -37,9 +37,6 @@ module Api
       @tier.destroy
     end
 
-    def content_ids
-      contents.pluck(:id)
-    end
     private
 
     def set_tier

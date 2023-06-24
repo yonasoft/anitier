@@ -224,7 +224,6 @@ export async function postTier(tier, tierListId, contentIds = []) {
     return await response.json();
 }
 
-
 export async function fetchTiersFromTierList(tierListId) {
     const response = await fetch(`/api/tier_lists/${tierListId}/tiers`, {
         method: 'GET',
@@ -233,10 +232,19 @@ export async function fetchTiersFromTierList(tierListId) {
             'X-CSRF-Token': token
         },
     });
+
     if (!response.ok) {
         throw new Error(`Error fetching tiers from tier list: ${response.statusText}`);
     }
-    return await response.json();
+
+    const tiers = await response.json();
+    console.log(tiers);  // Log the tiers received from the server.
+
+    return tiers.map(tier => {
+        console.log(tier);  // Log each tier.
+        const { id, rank, content_ids = [] } = tier;
+        return { id, rank, content_ids };
+    });
 }
 
 export async function updateTier(tierId, contentIds = []) {

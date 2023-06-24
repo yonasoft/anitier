@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './content_item.scss';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-export default function ContentItem({ item, index }) {
+export default function ContentItem({ id, item, index }) {
     console.log('item', item);
-    const id = item.api_id
-    const image = item.image_url
-    const name = item.name
+    if (!item) {
+        return null;
+    }
+
+    const image = item.image_url;
+    const name = item.name;
 
     return (
-        <Draggable key={id} draggableId={id.toString()} index={index}>
+        <Draggable key={id} draggableId={id ? id.toString() : "0"} index={index}>
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}

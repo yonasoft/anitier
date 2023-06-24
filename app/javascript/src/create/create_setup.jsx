@@ -9,12 +9,13 @@ export default function CreateSetup({ nextStep }) {
     const [userId, setUserId] = useState('');
     const [newTier, setNewTier] = useState('');
     const [tiers, setTiers] = useState([
-        { rank: 'S' },
-        { rank: 'A' },
-        { rank: 'B' },
-        { rank: 'C' },
-        { rank: 'D' },
+        { rank: 'S', content_ids: [] },
+        { rank: 'A', content_ids: [] },
+        { rank: 'B', content_ids: [] },
+        { rank: 'C', content_ids: [] },
+        { rank: 'D', content_ids: [] },
     ]);
+
     const [tierList, setTierList] = useState({
         title: '',
         description: '',
@@ -44,7 +45,7 @@ export default function CreateSetup({ nextStep }) {
     }
 
     const addNewTier = () => {
-        setTiers([...tiers, { rank: newTier.toUpperCase() }]);
+        setTiers([...tiers, { rank: newTier.toUpperCase(), content_ids: [] }]);
         setNewTier('');
     }
 

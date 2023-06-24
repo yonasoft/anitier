@@ -19,6 +19,7 @@ module Api
     end
 
     def update
+      puts params
       begin
         if @inventory.update(inventory_params.except(:content_ids))
           @inventory.contents = Content.where(id: inventory_params[:content_ids])
@@ -42,6 +43,7 @@ module Api
     def inventory_params
       params.require(:inventory).permit(:tier_list_id, content_ids: [])
     end
+
 
     def set_inventory
       @inventory = Inventory.find(params[:id])
