@@ -27,21 +27,19 @@ export default function CreateBuild({ tierListId }) {
             }).catch(console.error);
 
             fetchInventory(tierListId).then(data => {
+                console.log('fetched inventory', data)
                 if (!data.inventory.content_ids) {
                     setInventoryContentIds([]);
                 } else {
                     console.log('inventory data', data);
-                    setInventoryContentIds(data.content_ids);
+                    setInventoryContentIds(data.inventory.content_ids);
                 }
             });
-
             fetchTiersFromTierList(tierListId).then(data => {
                 setTiers(data);
                 console.log('tiers data', data);
                 const tierContentIds = data.flatMap(tier => tier.content_ids);
-                console.log('tier content ids', tierContentIds);
                 setAllContentsAsApi(prevState => [...prevState, ...tierContentIds]);
-                console.log('tiers data', data);
             });
         }
     }, [tierListId]);

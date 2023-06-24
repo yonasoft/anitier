@@ -3,20 +3,27 @@ import ReactDOM from 'react-dom';
 import './navbar.scss';
 import { fetchUserState, apiLogout } from '../../utils/internal_apis/auth_api';
 import { Button } from 'react-bootstrap';
-;
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
 
-
   useEffect(() => {
+    let isMounted = true;
+
     fetchUserState().then(userState => {
-      setLoggedIn(userState.logged_in);
-      if (userState.logged_in) {
-        setUsername(userState.username);
+      if (isMounted) { 
+        setLoggedIn(userState.logged_in);
+        if (userState.logged_in) {
+          setUsername(userState.username);
+        }
       }
     }).catch(error => console.error(error));
+
+    return () => {
+      isMounted = false; // Change the flag when component unmounts
+    }
+
   }, []);
 
   const handleLogout = async () => {

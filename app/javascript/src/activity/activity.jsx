@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './activity.scss';
 import NavBar from '../components/navbar/navbar'
-import TierColumn from '../tierlist_column/tier_column';
+
 
 export default function Activity() {
 

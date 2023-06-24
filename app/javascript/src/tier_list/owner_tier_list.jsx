@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './tier_list.scss';
 import NavBar from '../components/navbar/navbar';
 import { Button } from 'react-bootstrap';
-import { updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
+import { createContent, updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -10,80 +10,79 @@ import Inventory from '../components/inventory/inventory';
 import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
 
-export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, setInventoryAPIds, tiers, setTiers }) {
+export default function OwnerTierList({ tierList, setTierList, inventoryContentIds, setInventoryContentIds, tiers, setTiers, allContentsAsApi }) {
+
 
     const [showModal, setShowModal] = useState(false);
-    useEffect(() => {
-        console.log('tier list in owner tier list', tierList);
-        console.log('inventoryAPIds in owner tier list', inventoryAPIds);
-        console.log('tiers in owner tier list', tiers);
-    }, [tierList, inventoryAPIds, tiers])
-
-    useEffect(() => {
-        saveTierList()
-        // fetchTierList(tierListId).then(data => {
-        //     setTierList(data);
-        //     console.log('tier list data', data);
-        //     setTiers(data.tiers);
-        //     console.log('tiers data', data.tiers);
-        // }).catch(console.error);
-        // fetchInventory(tierListId).then(data => {
-        //     if (Array.isArray(data.contents)) {
-        //         console.log('inventory contents', data.contents);
-        //         setInventoryAPIds(data.contents.map(content => content.api_id));
-        //     } else {
-        //         console.error('Inventory contents data is not an array: ', data.contents);
-        //         setInventoryAPIds([]);
-        //     }
-        // }).catch(error => {
-        //     console.error(error);
-        //     setInventoryAPIds([]);
-        // });
-    }, [inventoryAPIds, tiers]);
-
-
-
     const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
-    async function saveTierList() {
-        await updateInventory(tierList.inventory.id, inventoryAPIds)
-            .catch(console.error);
-        // tiers.forEach(async tier => {
-        //     await updateTier(tier.id, tier.contents)
-        //         .catch(console.error);
-        // });
-    }
-
-    const isContentIdInInventory = (contentId) => inventoryAPIds.includes(contentId);
-
-    const addContentToInventory = (contentId) => {
-        if (!isContentIdInInventory(contentId)) {
-            setInventoryAPIds(prevInventory => [...prevInventory, contentId]);
+    useEffect(() => {
+        if (inventoryContentIds) {
+            updateInventory(tierList.id, inventoryContentIds)
+                .then(updatedInventory => {
+                    console.log("Updated inventory:", updatedInventory);
+                })
+                .catch(error => {
+                    console.error("Error updating inventory:", error);
+                });
         }
-    }
+    }, [inventoryContentIds, tierListId]);
 
-    const updateTierState = (tier, sourceIndex, destinationIndex, draggableId) => {
+    useEffect(() => {
+        tiers && tiers.forEach(tier => {
+            console.log('tier id when updated and content ids', tier.id, tier.content_ids);
+            updateTier(tier.id, tier.content_ids).then(data => {
+                console.log('tier data updated', data);
+            }).catch(console.error);
+        });
+    }, [tiers]);
+
+    const isApiAlreadyAdded = (apiId) => {
+        console.log('Checking if apiId is already added:', apiId);
+        console.log('allContentsAsApi:', allContentsAsApi);
+        if (!allContentsAsApi) return false;
+        return allContentsAsApi.includes(apiId);
+    };
+
+    const createContentAndUpdateInventory = async (apiId, name, imageUrl) => {
+        try {
+            const contentId = await createContent(apiId, name, imageUrl);
+            console.log('content id to add', contentId);
+
+            setInventoryContentIds(prevInventoryContentIds => [...(prevInventoryContentIds || []), contentId]);
+
+            setAllContentsAsApi(prevApiIds => {
+                const newApiIds = [...(prevApiIds || []), apiId];
+                console.log('Updated allContentsAsApi:', newApiIds);
+                return newApiIds;
+            });
+
+            console.log("Content added to the inventory successfully.");
+
+        } catch (error) {
+            console.error("Error adding content to inventory:", error);
+        }
+    };
+
+    const adjustTier = (tier, sourceIndex, destinationIndex, draggableId) => {
         console.log('tier in updateTier', tier);
-        const copy = Array.from(tier.contents);
+        const copy = Array.from(tier.content_ids);
 
-        // If sourceIndex is not null, we're moving an item from it
         if (sourceIndex !== null) {
             copy.splice(sourceIndex, 1);
         }
 
-        // If destinationIndex is not null, we're adding an item to it
         if (destinationIndex !== null) {
             copy.splice(destinationIndex, 0, parseInt(draggableId));
         }
 
         return {
             ...tier,
-            contents: copy,
+            content_ids: copy,
         };
     };
-
 
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
@@ -100,23 +99,22 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
         console.log("destination:", destination);
         console.log("tiers:", tiers);
 
-
         if (source.droppableId === 'inventory') {
-            const start = inventoryAPIds;
+            const start = inventoryContentIds;
             const finish = tiers[parseInt(destination.droppableId)];
 
             const startCopy = Array.from(start);
-            const finishCopy = Array.from(finish.contents);
+            const finishCopy = Array.from(finish.content_ids);
 
             console.log('draggable id', draggableId);
             startCopy.splice(source.index, 1);
             finishCopy.splice(destination.index, 0, parseInt(draggableId));
 
-            setInventoryAPIds([...startCopy]);
+            setInventoryContentIds([...startCopy]);
 
             const newTier = {
                 ...finish,
-                contents: finishCopy
+                content_ids: finishCopy
             };
 
             const newTiers = [...tiers];
@@ -129,14 +127,14 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
             const finish = tiers[parseInt(destination.droppableId)];
 
             if (start === finish) {
-                const startCopy = Array.from(start.contents);
+                const startCopy = Array.from(start.content_ids);
                 console.log('draggable id', draggableId);
                 startCopy.splice(source.index, 1);
                 startCopy.splice(destination.index, 0, parseInt(draggableId));
 
                 const newTier = {
                     ...start,
-                    contents: startCopy
+                    content_ids: startCopy
                 };
 
                 const newTiers = [...tiers];
@@ -146,14 +144,14 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
             }
             if (destination.droppableId === 'inventory') {
                 const start = tiers[parseInt(source.droppableId)];
-                const startCopy = Array.from(start.contents);
+                const startCopy = Array.from(start.content_ids);
 
                 console.log('draggable id', draggableId);
                 startCopy.splice(source.index, 1);
 
                 const newTier = {
                     ...start,
-                    contents: startCopy
+                    content_ids: startCopy
                 };
 
                 const newTiers = [...tiers];
@@ -161,23 +159,23 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
 
                 setTiers(newTiers);
 
-                const inventoryCopy = Array.from(inventoryAPIds);
+                const inventoryCopy = Array.from(inventoryContentIds);
                 inventoryCopy.splice(destination.index, 0, parseInt(draggableId));
-                setInventoryAPIds(inventoryCopy);
+                setInventoryContentIds(inventoryCopy);
             } else {
                 const start = tiers[parseInt(source.droppableId)];
                 const finish = tiers[parseInt(destination.droppableId)];
 
                 if (start === finish) {
                     console.log('draggable id', draggableId);
-                    const newTier = updateTierState(start, source.index, destination.index, draggableId);
+                    const newTier = adjustTier(start, source.index, destination.index, draggableId);
                     const newTiers = [...tiers];
                     newTiers[parseInt(source.droppableId)] = newTier;
                     setTiers(newTiers);
                 } else {
                     console.log('draggable id', draggableId);
-                    const newStart = updateTierState(start, source.index, null, draggableId);
-                    const newFinish = updateTierState(finish, null, destination.index, draggableId);
+                    const newStart = adjustTier(start, source.index, null, draggableId);
+                    const newFinish = adjustTier(finish, null, destination.index, draggableId); // Note the change from 'ajustTier' to 'adjustTier' here
                     const newTiers = [...tiers];
                     newTiers[parseInt(source.droppableId)] = newStart;
                     newTiers[parseInt(destination.droppableId)] = newFinish;
@@ -192,11 +190,11 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
 
     return (
         <React.Fragment>
-            <DragDropContext onDragEnd={result => onDragEnd(result)}>
+            <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <NavBar />
-                <div className="container-fluid bg-light pa-3">
+                <div className="container bg-light pa-3">
                     <div className="row">
-                        <div className='col-12 d-flex justify-content-between flex-column-reverse flex-md-row'>
+                        <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                             <h1 className="my-2">Create(Build)</h1>
                             <div>
                                 <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
@@ -230,11 +228,9 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
                         <div className="col-8">
                             <div><a className="btn btn-primary text-light my-2" href="#">Share</a></div>
                             <div id="ranks" className="row">
-                                {tiers.map((tier, index) => (
+                                {tiers && tiers.map((tier, index) => (
                                     <Tier
-                                        tier={tier}
-                                        key={tier.id}
-                                        tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                                        key={index} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
                                     />
                                 ))}
                             </div>
@@ -244,25 +240,29 @@ export default function OwnerTierList({ tierList, setTierList, inventoryAPIds, s
                                 <h3 className="my-2">Inventory</h3>
                                 <Button className="my-2" onClick={handleOpenModal}>Add</Button>
                             </div>
-                            <Inventory inventoryIds={inventoryAPIds} setInventoeryIds={setInventoryAPIds} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+                            <Inventory inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} source={tierList.source} contentType={ContentType[tierList.content_type]} />
+
                             {tierList.source === 'anilist' && (
                                 <AddFromAniListModal
                                     tierList={tierList}
                                     showModal={showModal}
                                     handleCloseModal={handleCloseModal}
                                     contentType={ContentType[tierList.content_type]}
-                                    inventory={inventoryAPIds}
-                                    addContentToInventory={addContentToInventory}
+                                    inventoryContent={inventoryContentIds}
+                                    addContentToInventory={createContentAndUpdateInventory}
+                                    isApiAlreadyAdded={isApiAlreadyAdded}
                                 />
                             )}
+
                             {tierList.source === 'mal' && (
                                 <AddFromMALModal
                                     tierList={tierList}
                                     showModal={showModal}
                                     handleCloseModal={handleCloseModal}
                                     contentType={ContentType[tierList.content_type]}
-                                    inventory={inventoryAPIds}
-                                    addContentToInventory={addContentToInventory}
+                                    inventoryContent={inventoryContentIds}
+                                    addContentToInventory={createContentAndUpdateInventory}
+                                    isApiAlreadyAdded={isApiAlreadyAdded}
                                 />
                             )}
                         </div>

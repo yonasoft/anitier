@@ -72,9 +72,13 @@ module Api
     end
 
     def tiers
-      render json: @tier_list.tiers
+      tiers_with_content_ids = @tier_list.tiers.map do |tier| 
+        content_ids = tier.contents.present? ? tier.contents.pluck(:id) : []
+        tier.attributes.merge(content_ids: content_ids)
+      end
+      render json: tiers_with_content_ids
     end
-    
+
     private
 
     def set_tier_list

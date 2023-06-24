@@ -242,12 +242,21 @@ export async function fetchTiersFromTierList(tierListId) {
 
     return tiers.map(tier => {
         console.log(tier);  // Log each tier.
-        const { id, rank, content_ids = [] } = tier;
+        let { id, rank, content_ids } = tier;
+
+        // Ensure content_ids is an array if it is null.
+        if (content_ids === undefined) {
+            content_ids = [];
+        }
+
         return { id, rank, content_ids };
     });
 }
 
+
 export async function updateTier(tierId, contentIds = []) {
+    console.log(`Updating tier ${tierId} with content_ids: ${contentIds}`);
+
     const response = await fetch(`/api/tiers/${tierId}`, {
         method: 'PATCH',
         headers: {
@@ -266,30 +275,8 @@ export async function updateTier(tierId, contentIds = []) {
     }
 
     const responseData = await response.json();
-    responseData.content_ids = responseData.content_ids || [];
     return responseData;
 }
-
-export async function fetchInventory(inventoryId) {
-    const response = await fetch(`/api/inventories/${inventoryId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error fetching inventory: ${response.statusText}`);
-    }
-
-    let responseData = await response.json();
-    responseData = responseData || {};
-    responseData.content_ids = responseData.content_ids || [];
-
-    return responseData;
-}
-
 
 export async function updateInventory(inventoryId, contentIds = []) {
     const response = await fetch(`/api/inventories/${inventoryId}`, {
@@ -309,15 +296,25 @@ export async function updateInventory(inventoryId, contentIds = []) {
         throw new Error(`Error updating inventory: ${response.statusText}`);
     }
 
-    let responseData = await response.json();
+    const responseData = await response.json();
+    return responseData;
+}
 
-    if (responseData) {
-        responseData.content_ids = responseData.content_ids || [];
-    } else {
-        console.error('Inventory is undefined in the response');
+// Fetch inventory function
+export async function fetchInventory(inventoryId) {
+    const response = await fetch(`/api/inventories/${inventoryId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error fetching inventory: ${response.statusText}`);
     }
 
-    console.log('Update INV RESPONSE DATA', JSON.stringify(responseData));
+    const responseData = await response.json();
     return responseData;
 }
 
