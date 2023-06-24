@@ -46,7 +46,7 @@ export default function SignUpWidget({ setRequireSignup }) {
 
         try {
             await signup(username, email, password);
-            await login(username, password, token);
+            await login(username, password);
             handleShow();
             setTimeout(() => {
                 handleClose();
