@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
-import { fetchUserState, logout } from '../../utils/internal_apis/auth_api';;
+import { fetchUserState, logout } from '../../utils/internal_apis/auth_api'; import { Button } from 'react-bootstrap';
+;
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -17,7 +18,7 @@ export default function NavBar() {
     }).catch(error => console.error(error));
   }, []);
 
-  const logout = async () => {
+  const handleLogout = async () => {
     try {
       await logout();
       setLoggedIn(false);
@@ -52,7 +53,7 @@ export default function NavBar() {
                   </a>
                   <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li><a className="dropdown-item" href="#">Profile</a></li>
-                    <li><a className="dropdown-item" onClick={logout}>Logout</a></li>
+                    <li><Button className="dropdown-item" onClick={handleLogout}>Logout</Button></li>
                   </ul>
                 </li>
               </>

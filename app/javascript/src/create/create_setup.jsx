@@ -6,7 +6,7 @@ import { fetchUserState } from '../utils/internal_apis/auth_api';
 
 export default function CreateSetup({ nextStep }) {
 
-    const [userId, setUserId] = useState('');
+    const [userState, setUserState] = useState({});
     const [newTier, setNewTier] = useState('');
     const [tiers, setTiers] = useState([
         { rank: 'S', content_ids: [] },
@@ -26,9 +26,10 @@ export default function CreateSetup({ nextStep }) {
         downvotes: 0,
     });
 
+
     useEffect(() => {
         fetchUserState().then(userState => {
-            setUserId(userState.user_id);
+            setUserId(userState);
             setTierList(prevState => ({ ...prevState, user_id: userState.user_id }));
         }).catch(error => console.error(error));
     }, []);
@@ -50,20 +51,26 @@ export default function CreateSetup({ nextStep }) {
     }
 
     const saveTierList = async () => {
-        try {
-            const tierListResponse = await postTierList(tierList);
-            console.log('tierListResponse:', tierListResponse);
+        if (userState.logged_in) {
+            try {
+                const tierListResponse = await postTierList(tierList);
+                console.log('tierListResponse:', tierListResponse);
 
-            const tierListId = tierListResponse.tier_list.id;  // Extracting the tierListId from the response
+                const tierListId = tierListResponse.tier_list.id;  // Extracting the tierListId from the response
 
-            for (const tier of tiers) {
-                const tierResponse = await postTier(tier, tierListId);
-                console.log(tierResponse);
+                for (const tier of tiers) {
+                    const tierResponse = await postTier(tier, tierListId);
+                    console.log(tierResponse);
+                }
+
+                nextStep(tierListId);
+            } catch (error) {
+                console.error(error);
             }
-
-            nextStep(tierListId);
-        } catch (error) {
-            console.error(error);
+        } else {
+            <div class="alert alert-danger" role="alert">
+                This is a danger alert—check it out!
+            </div>
         }
     };
 
