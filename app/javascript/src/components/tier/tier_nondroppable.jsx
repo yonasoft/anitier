@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import './tier.scss';
+import { Droppable } from 'react-beautiful-dnd';
+
 import ContentItem from '../content_item/content_item';
 import { fetchContentModel } from '../../utils/internal_apis/tierlist_apis';
+
+import './tier.scss';
+import ContentItemNonDraggable from '../content_item/content_item_nondraggable';
+
 
 
 export default function TierNonDroppable({ tier, tierIndex, source, contentType }) {
@@ -26,17 +31,17 @@ export default function TierNonDroppable({ tier, tierIndex, source, contentType 
                 {tier.rank}
             </div>
 
-
             <div
-
                 className='content bg-white p-2 w-100'
             >
                 {tier && tierContent && tierContent.map((item, index) => (
-                    <ContentItem key={item.id} item={item} index={index} />
+                    <ContentItemNonDraggable key={item.id} item={item} index={index} />
                 ))}
-
             </div>
         </div>
     );
 
 };
+
+
+
