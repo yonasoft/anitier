@@ -28,7 +28,7 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
                     console.error("Error updating inventory:", error);
                 });
         }
-    }, [inventoryContentIds, tierListId]);
+    }, [inventoryContentIds, tierList]);
 
     useEffect(() => {
         tiers && tiers.forEach(tier => {
