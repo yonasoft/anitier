@@ -15,3 +15,5 @@ global.AbortController = AbortController;
 Rails.start()
 ActiveStorage.start()
 
+import  './packs/application.scss'
+
