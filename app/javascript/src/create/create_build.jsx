@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './create.scss';
 import { Button } from 'react-bootstrap';
-import { fetchTierList, fetchInventory, updateInventory, updateTier, createContent, fetchTiersFromTierList, f } from '../utils/internal_apis/tierlist_apis';
+import { fetchTierList, fetchInventory, updateInventory, updateTier, createContent, fetchTiersFromTierList, updateTierListPosted } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -9,6 +9,8 @@ import Inventory from '../components/inventory/inventory';
 import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
 import NavBar from '../components/navbar/navbar';
+import Alert from 'react-bootstrap/Alert';
+
 
 
 export default function CreateBuild({ tierListId }) {
@@ -18,6 +20,9 @@ export default function CreateBuild({ tierListId }) {
     const [tiers, setTiers] = useState([]);
     const [allContentsAsApi, setAllContentsAsApi] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertVariant, setAlertVariant] = useState('success');
 
     useEffect(() => {
         if (tierListId) {
@@ -67,6 +72,35 @@ export default function CreateBuild({ tierListId }) {
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+
+    const onFinish = () => {
+        setAlertVariant('success');
+        setAlertMessage(`Tier list ${tierList.title} is saved!`);
+        setShowAlert(true);
+        // Navigate after a delay so the user can see the alert
+        setTimeout(() => {
+            window.location.href = '/home';
+        }, 2000);
+    };
+
+    const onPost = async () => {
+        try {
+            await updateTierListPosted(tierListId, true);
+            setAlertVariant('success');
+            setAlertMessage(`Tier list ${tierList.title} is posted!`);
+            setShowAlert(true);
+            // Navigate after a delay so the user can see the alert
+            setTimeout(() => {
+                window.location.href = '/home';
+            }, 2000);
+        } catch (error) {
+            console.error("Error posting the tier list: ", error);
+            setAlertVariant('danger');
+            setAlertMessage("An error occurred when posting the tier list. Please try again later.");
+            setShowAlert(true);
+        }
+    };
+
 
     const isApiAlreadyAdded = (apiId) => {
         console.log('Checking if apiId is already added:', apiId);
@@ -226,9 +260,12 @@ export default function CreateBuild({ tierListId }) {
                     <div className="row">
                         <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                             <h1 className="my-2">Create(Build)</h1>
+                            {showAlert && <Alert variant={alertVariant} onClose={() => setShowAlert(false)} dismissible>
+                                {alertMessage}
+                            </Alert>}
                             <div>
-                                <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
-                                <a className="mx-2 my-2 btn btn-primary" href="/" title='Make your tier list public'>Post</a>
+                                <Button className="mx-2 my-2 btn btn-secondary" onClick={onFinish} title='Finish tier list creation'>Finish</Button>
+                                <Button className="mx-2 my-2 btn btn-primary" onClick={onPost} title='Make your tier list public'>Post</Button>
                             </div>
                         </div>
                         <div className="col-8">

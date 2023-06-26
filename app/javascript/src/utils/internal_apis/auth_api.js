@@ -78,3 +78,18 @@ export const apiLogout = async () => {
 
     return response;
 };
+
+export const fetchUserDataById = async (userId) => {
+    const response = await fetch(`/api/users/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Could not fetch user data: ${response.statusText}`);
+    }
+    return response.json();
+};

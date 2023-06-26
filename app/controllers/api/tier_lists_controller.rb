@@ -13,7 +13,7 @@ module Api
 
     def update
       if @tier_list.update(tier_list_params)
-        render json: @tier_list.as_json(include: { tiers: {  }, inventory: { methods:  } })
+        render json: @tier_list.as_json(include: { tiers: { }, inventory: { } })
       else
         render json: { errors: @tier_list.errors }, status: :unprocessable_entity
       end

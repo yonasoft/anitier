@@ -1,27 +1,29 @@
-import React, { } from 'react';
+import React, { useState, useEffect } from 'react';
 import './tier_list.scss';
 import NavBar from '../components/navbar/navbar';
 import { postTier, postTierList } from '../utils/internal_apis/tierlist_apis';
-import { fetchUserState } from '../utils/internal_apis/auth_api';
+import { fetchUserDataById, fetchUserState } from '../utils/internal_apis/auth_api';
 import Tier from '../components/tier/tier';
 import { ContentType } from '../utils/constants';
 import TierNonDroppable from '../components/tier/tier_nondroppable';
 
 export default function UserTierList({ tierList, tiers }) {
+    const [user, setUser] = useState({});
+
+    useEffect(() => {
+        fetchUserDataById(tierList.user_id)
+            .then(userData => setUser(userData))
+            .catch(error => console.error(error));
+    }, [tierList]);
 
 
     return (<React.Fragment>
         <NavBar />
-        <div className="container-fluid bg-light pa-3">
+        <div className="container bg-light pa-3">
             <div className="row">
-                <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
-                    <h1 className="my-2">Create(Build)</h1>
-                    <div>
-                        <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish looking at tier list'>Done</a>
-                    </div>
-                </div>
                 <div className="col-12">
-                    <h3>{tierList.title}</h3>
+                    <h1>{tierList.title}</h1>
+                    <h4>{`by ${user.username}`}</h4>
                     <p>{tierList.description}</p>
                 </div>
                 <div className="col-12">

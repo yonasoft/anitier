@@ -17,6 +17,8 @@ export default function CreateSetup({ nextStep }) {
         { rank: 'D', content_ids: [] },
     ]);
     const [showError, setShowError] = useState(false);
+    const [showTitleAlert, setShowTitleAlert] = useState(false);
+    const [showTiersAlert, setShowTiersAlert] = useState(false);
 
 
     const [tierList, setTierList] = useState({
@@ -63,6 +65,19 @@ export default function CreateSetup({ nextStep }) {
     }
 
     const saveTierList = async () => {
+        setShowTitleAlert(false);
+        setShowTiersAlert(false);
+
+        if (!tierList.title) {
+            setShowTitleAlert(true);
+            return;
+        }
+
+        if (tiers.length < 2) {
+            setShowTiersAlert(true);
+            return;
+        }
+
         try {
             const tierListResponse = await postTierList(tierList);
             console.log('tierListResponse:', tierListResponse);
@@ -78,8 +93,8 @@ export default function CreateSetup({ nextStep }) {
         } catch (error) {
             console.error(error);
         }
-
     };
+
 
     return (
         <React.Fragment>
@@ -90,6 +105,16 @@ export default function CreateSetup({ nextStep }) {
                     {showError &&
                         <div className="alert alert-danger" role="alert">
                             Must be logged in to create tier list!
+                        </div>
+                    }
+                    {showTitleAlert &&
+                        <div className="alert alert-danger" role="alert">
+                            Please fill out the title before proceeding.
+                        </div>
+                    }
+                    {showTiersAlert &&
+                        <div className="alert alert-danger" role="alert">
+                            Please add at least two tiers before proceeding.
                         </div>
                     }
                     <div className="col-auto d-flex justify-content-end">

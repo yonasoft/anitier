@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     get '/fetch_mal_content', to: 'mal_api#fetch_mal_content'
     get '/fetch_user_anime_list', to: 'mal_api#fetch_user_anime_list'
     get '/fetch_user_manga_list', to: 'mal_api#fetch_user_manga_list'
-    resources :users, only: [:create]
+    resources :users, only: [:show, :create]
     resources :tiers
     resources :inventories, only: [:show, :update]
     resources :template_tier_lists
