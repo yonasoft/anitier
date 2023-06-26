@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  tier_list: one
+  upvoted: false
+  downvoted: false
+
+two:
+  user: two
+  tier_list: two
+  upvoted: false
+  downvoted: false
