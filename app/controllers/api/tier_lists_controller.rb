@@ -78,6 +78,30 @@ module Api
       end
       render json: tiers_with_content_ids
     end
+    
+    def upvote
+      tier_list = TierList.find(params[:id])
+      vote = tier_list.votes.find_or_initialize_by(user_id: current_user.id)
+      vote.upvoted = true
+      vote.downvoted = false
+      vote.save
+      render json: { status: 'success' }
+    end
+
+    def downvote
+      tier_list = TierList.find(params[:id])
+      vote = tier_list.votes.find_or_initialize_by(user_id: current_user.id)
+      vote.upvoted = false
+      vote.downvoted = true
+      vote.save
+      render json: { status: 'success' }
+    end
+
+    def user_vote_status(user)
+      vote = votes.find_by(user_id: user.id)
+      return { upvoted: vote.upvoted, downvoted: vote.downvoted } if vote
+      { upvoted: false, downvoted: false }
+    end
 
     private
 

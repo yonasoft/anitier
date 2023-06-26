@@ -362,6 +362,61 @@ export async function createContent(api_id, name, imageUrl) {
     return responseData.id;
 }
 
+// Function to upvote a tier list
+export async function upvoteTierList(tierListId) {
+    const response = await fetch(`/api/tier_lists/${tierListId}/upvote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error upvoting tier list: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
+// Function to downvote a tier list
+export async function downvoteTierList(tierListId) {
+    const response = await fetch(`/api/tier_lists/${tierListId}/downvote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error downvoting tier list: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
+// Function to check the vote status of a user for a specific tier list
+export async function checkUserVote(tierListId, userId) {
+    const response = await fetch(`/api/tier_lists/${tierListId}/vote_status/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error fetching user vote status: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
+
 
 
 

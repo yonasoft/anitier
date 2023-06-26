@@ -34,7 +34,7 @@ export default function Tier({ tier, tierIndex, source, contentType }) {
                     <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className='content bg-white p-2 w-100'
+                        className='content bg-light p-2 w-100'
                     >
                         {tier && tierContent && tierContent.map((item, index) => (
                             <ContentItem key={item.id} item={item} index={index} />

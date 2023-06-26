@@ -24,11 +24,11 @@ export default function Inventory({ inventoryContentIds }) {
 
 
     return (
-        <Droppable className='inventory-drop' droppableId='inventory'>
+        <Droppable className='inventory-drop bg-light' droppableId='inventory'>
             {(provided, snapshot) => (
                 <div {...provided.droppableProps}
                     ref={provided.innerRef}
-                    id='inventory' className='bg-white grid scrollable-results py-2 mb-2 overflow-auto'>
+                    id='inventory' className='bg-light grid scrollable-results py-2 mb-2 overflow-auto'>
                     {inventoryContent && inventoryContent.filter(item => item).map((item, index) => (
                         <ContentItem key={item.id} item={item} index={index} />
                     ))}

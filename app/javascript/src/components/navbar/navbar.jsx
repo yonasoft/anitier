@@ -52,7 +52,7 @@ export default function NavBar() {
             <Nav>
               <NavDropdown title={username} id="collasible-nav-dropdown" className="font-weight-bold text-light">
                 <NavDropdown.Item href="#">Profile</NavDropdown.Item>
-                <NavDropdown.Item><Button variant="link" onClick={handleLogout}>Logout</Button></NavDropdown.Item>
+                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           ) : (

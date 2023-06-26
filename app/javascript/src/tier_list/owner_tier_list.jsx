@@ -192,15 +192,9 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
         <React.Fragment>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <NavBar />
-                <div className="container bg-light pa-3">
+                <div className="container bg-white pa-3">
                     <div className="row">
-                        <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
-                            <h1 className="my-2">Create(Build)</h1>
-                            <div>
-                                <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
-                                <a className="mx-2 my-2 btn btn-primary" href="/" title='Make your tier list public'>Post</a>
-                            </div>
-                        </div>
+
                         <div className='col-12'>
                             <div className="form-floating my-3">
                                 <input
@@ -226,7 +220,14 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
 
                         </div>
                         <div className="col-8">
-                            <div><a className="btn btn-primary text-light my-2" href="#">Share</a></div>
+                            <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
+                                <div>
+                                    <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
+                                    <a className="mx-2 my-2 btn btn-primary" href="/" title='Make your tier list public'>Post</a>
+                                    <a className="mx-2 my-2 btn btn-primary" href="#">Share</a>
+                                </div>
+                            </div>
+
                             <div id="ranks" className="row">
                                 {tiers && tiers.map((tier, index) => (
                                     <Tier

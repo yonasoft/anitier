@@ -99,24 +99,10 @@ export default function CreateSetup({ nextStep }) {
     return (
         <React.Fragment>
             <NavBar />
-            <div className="container bg-light pa-3">
+            <div className="container bg-white pa-3">
                 <div className="row align-items-center">
                     <h1 className="col">Create (Setup)</h1>
-                    {showError &&
-                        <div className="alert alert-danger" role="alert">
-                            Must be logged in to create tier list!
-                        </div>
-                    }
-                    {showTitleAlert &&
-                        <div className="alert alert-danger" role="alert">
-                            Please fill out the title before proceeding.
-                        </div>
-                    }
-                    {showTiersAlert &&
-                        <div className="alert alert-danger" role="alert">
-                            Please add at least two tiers before proceeding.
-                        </div>
-                    }
+
                     <div className="col-auto d-flex justify-content-end">
                         <a className="btn btn-secondary text-light mb-auto mx-2" href="/">Cancel</a>
                         <button className="btn btn-primary text-light mb-auto ml-2 mx-2" disabled={!loggedIn} onClick={saveTierList}>Next</button>
@@ -124,6 +110,21 @@ export default function CreateSetup({ nextStep }) {
                 </div>
                 <div className="row">
                     <div className="col-8 ">
+                        {showError &&
+                            <div className="alert alert-danger" role="alert">
+                                Must be logged in to create tier list!
+                            </div>
+                        }
+                        {showTitleAlert &&
+                            <div className="alert alert-danger" role="alert">
+                                Please fill out the title before proceeding.
+                            </div>
+                        }
+                        {showTiersAlert &&
+                            <div className="alert alert-danger" role="alert">
+                                Please add at least two tiers before proceeding.
+                            </div>
+                        }
                         <div className="form-floating my-3">
                             <input type="text" className="form-control" id="title" onChange={handleInputChange} />
                             <label htmlFor="title">Title</label>

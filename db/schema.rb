@@ -10,12 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_20_184411) do
+ActiveRecord::Schema.define(version: 2023_06_26_123810) do
 
   create_table "contents", force: :cascade do |t|
     t.integer "api_id"
-    t.string "name"
-    t.string "image_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position"
@@ -23,6 +21,8 @@ ActiveRecord::Schema.define(version: 2023_06_20_184411) do
     t.integer "contentable_id"
     t.integer "inventory_id"
     t.integer "tier_id"
+    t.string "name"
+    t.string "image_url"
     t.index ["contentable_type", "contentable_id"], name: "index_contents_on_contentable"
     t.index ["inventory_id"], name: "index_contents_on_inventory_id"
     t.index ["tier_id"], name: "index_contents_on_tier_id"
@@ -88,7 +88,21 @@ ActiveRecord::Schema.define(version: 2023_06_20_184411) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"
+    t.text "bio"
+    t.string "mal_url"
+    t.string "anilist_url"
     t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  create_table "votes", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "tier_list_id", null: false
+    t.boolean "upvoted"
+    t.boolean "downvoted"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["tier_list_id"], name: "index_votes_on_tier_list_id"
+    t.index ["user_id"], name: "index_votes_on_user_id"
   end
 
   add_foreign_key "contents", "inventories"
@@ -97,4 +111,6 @@ ActiveRecord::Schema.define(version: 2023_06_20_184411) do
   add_foreign_key "template_tier_lists", "users"
   add_foreign_key "tier_lists", "users"
   add_foreign_key "tiers", "tier_lists"
+  add_foreign_key "votes", "tier_lists"
+  add_foreign_key "votes", "users"
 end

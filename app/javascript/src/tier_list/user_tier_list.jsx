@@ -12,7 +12,10 @@ export default function UserTierList({ tierList, tiers }) {
 
     useEffect(() => {
         fetchUserDataById(tierList.user_id)
-            .then(userData => setUser(userData))
+            .then(userData => {
+                setUser(userData)
+                console.log('user data', userData);
+            })
             .catch(error => console.error(error));
     }, [tierList]);
 
@@ -23,7 +26,7 @@ export default function UserTierList({ tierList, tiers }) {
             <div className="row">
                 <div className="col-12">
                     <h1>{tierList.title}</h1>
-                    <h4>by {<a href='/users/user.id'>{user.username}</a>}</h4>
+                    <h5>by <a href={`/user/${user.id}`}>{user.username}</a></h5>
                     <p>{tierList.description}</p>
                 </div>
                 <div className="col-12">

@@ -56,13 +56,19 @@ export default function TierList({ tierListId }) {
         }
     }, [tierList]);
 
+    if (!tierList) return <div>Loading....</div>;
+
     return (
+
         <div className='root'>
-            {loading ? 'Loading...' :
-                userId === tierList.user_id ?
-                    <OwnerTierList tierList={tierList} setTierList={setTierList} inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} tiers={tiers} setTiers={setTiers} allContentsAsApi={allContentsAsApi} />
-                    :
-                    <UserTierList tierList={tierList} tiers={tiers} />}
-        </div>
+            {
+                loading ? 'Loading...' :
+                    userId === tierList.user_id ?
+                        <OwnerTierList tierList={tierList} setTierList={setTierList} inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} tiers={tiers} setTiers={setTiers} allContentsAsApi={allContentsAsApi} />
+                        :
+                        <UserTierList tierList={tierList} tiers={tiers} />
+            }
+        </div >
     );
+
 }
