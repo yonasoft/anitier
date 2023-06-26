@@ -23,7 +23,7 @@ export default function UserTierList({ tierList, tiers }) {
             <div className="row">
                 <div className="col-12">
                     <h1>{tierList.title}</h1>
-                    <h4>{`by ${user.username}`}</h4>
+                    <h4>by {<a href='/users/user.id'>{user.username}</a>}</h4>
                     <p>{tierList.description}</p>
                 </div>
                 <div className="col-12">

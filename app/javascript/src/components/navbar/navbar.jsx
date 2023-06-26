@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './navbar.scss';
 import { fetchUserState, apiLogout } from '../../utils/internal_apis/auth_api';
-import { Button } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown, Button } from 'react-bootstrap';
 
 export default function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -12,7 +12,7 @@ export default function NavBar() {
     let isMounted = true;
 
     fetchUserState().then(userState => {
-      if (isMounted) { 
+      if (isMounted) {
         setLoggedIn(userState.logged_in);
         if (userState.logged_in) {
           setUsername(userState.username);
@@ -37,48 +37,31 @@ export default function NavBar() {
     }
   }
 
-
   return (
-    <nav className="navbar navbar-expand shadow p-3">
+    <Navbar expand="md" className="navbar-dark shadow p-2" style={{ backgroundColor: '#3F5C9E' }}>
       <div className="container">
-        <a className="navbar-brand text-light font-weight-bold" href="/"><span id="brand-ani">Ani</span><span id="brand-tier">Tier</span></a>
-        <div className="collapse navbar-collapse d-flex justify-content-end " id="navbarSupportedContent">
-          <ul className="navbar-nav d-flex justify-content-end me-3">
-            <li className="nav-item">
-              <a className="nav-link font-weight-bold text-light" href="/home">Home</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link font-weight-bold text-light" href="/create">Create</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link font-weight-bold text-light " href="/templates">Templates</a>
-            </li>
-          </ul>
-          <ul id="account-nav" className="navbar-nav ml-auto">
-            {loggedIn ? (
-              <>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle font-weight-bold text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {username}
-                  </a>
-                  <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a className="dropdown-item" href="#">Profile</a></li>
-                    <li><Button className="dropdown-item" onClick={handleLogout}>Logout</Button></li>
-                  </ul>
-                </li>
-              </>
-            ) : (
-              <li className="nav-item">
-                <a id="login-btn" className="nav-link btn btn-primary btn-block mb-0 text-light font-weight-bold" href="/login">Login</a>
-              </li>
-            )}
-          </ul>
-        </div>
+        <Navbar.Brand href="/" className="text-light font-weight-bold"><span id="brand-ani">Ani</span><span id="brand-tier">Tier</span></Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
+          <Nav className="me-3">
+            <Nav.Link href="/home" className="font-weight-bold text-light">Home</Nav.Link>
+            <Nav.Link href="/create" className="font-weight-bold text-light">Create</Nav.Link>
+            <Nav.Link href="/templates" className="font-weight-bold text-light">Templates</Nav.Link>
+          </Nav>
+          {loggedIn ? (
+            <Nav>
+              <NavDropdown title={username} id="collasible-nav-dropdown" className="font-weight-bold text-light">
+                <NavDropdown.Item href="#">Profile</NavDropdown.Item>
+                <NavDropdown.Item><Button variant="link" onClick={handleLogout}>Logout</Button></NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          ) : (
+            <Nav>
+              <Nav.Link id="login-btn" href="/login" className="btn btn-primary btn-block mb-0 text-light font-weight-bold">Login</Nav.Link>
+            </Nav>
+          )}
+        </Navbar.Collapse>
       </div>
-    </nav>
+    </Navbar>
   )
 }
-
-
-
-
