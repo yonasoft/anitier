@@ -23,7 +23,7 @@ export default function Activity() {
                 </select>
               </div>
             </div>
-            <div className="input-group mt-3 mb-3 bg-light">
+            <div className="input-group mt-3 mb-3 bg-white">
               <input type="text" className="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" />
               <div className="input-group-append">
                 <button className="btn btn-outline-secondary" type="button">Search</button>

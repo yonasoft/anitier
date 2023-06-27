@@ -416,8 +416,25 @@ export async function checkUserVote(tierListId, userId) {
     return responseData;
 }
 
+export async function updateUser(userId, userObject) {
+    const { username, email, password, bio, mal_url, anilist_url } = userObject;
 
+    const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+        body: JSON.stringify({ username, email, password, bio, mal_url, anilist_url }),
+    });
 
+    if (!response.ok) {
+        console.error('Failed to update user');
+    }
+
+    const updatedUser = await response.json();
+    return updatedUser;
+}
 
 
 

@@ -19,6 +19,16 @@ module Api
       end
     end
 
+    def update
+      @user = User.find(params[:id])
+
+      if @user.update(user_params)
+        render json: { status: 'SUCCESS', message: 'User updated', data: @user }, status: :ok
+      else
+        render json: @user.errors, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def log_in(user)

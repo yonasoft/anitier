@@ -24,6 +24,7 @@ Rails.application.routes.draw do
         get 'tier_lists', to: 'tier_lists#user_lists'
         get 'posted_tier_lists', to: 'tier_lists#posted_user_lists'
         get 'unposted_tier_lists', to: 'tier_lists#unposted_user_lists'
+        put '', to: 'users#update'
       end
     end
 

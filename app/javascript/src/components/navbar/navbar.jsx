@@ -5,6 +5,7 @@ import { fetchUserState, apiLogout } from '../../utils/internal_apis/auth_api';
 import { Navbar, Nav, NavDropdown, Button } from 'react-bootstrap';
 
 export default function NavBar() {
+  const [userId, setUserId] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
 
@@ -16,6 +17,7 @@ export default function NavBar() {
         setLoggedIn(userState.logged_in);
         if (userState.logged_in) {
           setUsername(userState.username);
+          setUserId(userState.user_id);
         }
       }
     }).catch(error => console.error(error));
@@ -51,7 +53,7 @@ export default function NavBar() {
           {loggedIn ? (
             <Nav>
               <NavDropdown title={username} id="collasible-nav-dropdown" className="font-weight-bold text-light">
-                <NavDropdown.Item href="#">Profile</NavDropdown.Item>
+                <NavDropdown.Item href={`/user/${userId}`}>Profile</NavDropdown.Item>
                 <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>

@@ -15,7 +15,7 @@ export default function User({ userId }) {
                 console.log('user data', user);
             })
             .catch(error => console.error(error));
-    }, [userId]);
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -37,7 +37,7 @@ export default function User({ userId }) {
     return (currentUserOnPage && loggedInUser) ? (
         <div className='root'>
             {currentUserOnPage.id === loggedInUser.user_id ?
-                <UserSelf userOnPage={currentUserOnPage} /> :
+                <UserSelf userOnPage={currentUserOnPage} setUserOnPage={setCurrentUserOnPage} /> :
                 <UserOther userOnPage={currentUserOnPage} />}
         </div>
     ) : <div>Loading...</div>

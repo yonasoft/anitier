@@ -2,7 +2,6 @@ class User < ApplicationRecord
   has_many :tier_lists
   has_many :votes
 
-
   before_save { self.email = email.downcase if email.present? }
   before_save { self.username = username.downcase if username.present? }
 
@@ -12,5 +11,5 @@ class User < ApplicationRecord
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
   has_secure_password
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, length: { minimum: 6 }, allow_nil: true
 end
