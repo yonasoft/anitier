@@ -26,7 +26,7 @@ module Api
     def create
       tier_list = TierList.new(tier_list_params)
 
-      if tier_list.save!
+      if tier_list.save
         render json: { tier_list: tier_list, inventory: tier_list.inventory }, status: :created
       else
         Rails.logger.error("TierList validation failed: #{tier_list.errors.full_messages}")
@@ -35,7 +35,11 @@ module Api
     end
 
     def destroy
-      @tier_list.destroy
+      if @tier_list.destroy
+        render json: { message: 'Tier list deleted successfully' }, status: :ok
+      else
+        render json: { error: 'Failed to delete tier list' }, status: :unprocessable_entity
+      end
     end
 
     def recent
@@ -101,6 +105,22 @@ module Api
       vote = votes.find_by(user_id: user.id)
       return { upvoted: vote.upvoted, downvoted: vote.downvoted } if vote
       { upvoted: false, downvoted: false }
+    end
+
+    def filtered_user_lists
+      @user = User.find(params[:user_id])
+      @tier_lists = @user.tier_lists.where(content_type: params[:content_type])
+
+      case params[:posted_status]
+      when 'all'
+        # Do nothing, we want all lists
+      when 'posted'
+        @tier_lists = @tier_lists.posted
+      when 'unposted'
+        @tier_lists = @tier_lists.unposted
+      end
+
+      render json: @tier_lists
     end
 
     private

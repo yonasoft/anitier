@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './tier_column.scss';
 
-export default function TierColumn() {
+export default function TierColumn({tierList, setTierList, listInfo, setListInfo}) {
   return (
     <div id="tier-column" className='container'>
       <div className='col-md-6'>

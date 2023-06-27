@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     get '/fetch_mal_content', to: 'mal_api#fetch_mal_content'
     get '/fetch_user_anime_list', to: 'mal_api#fetch_user_anime_list'
     get '/fetch_user_manga_list', to: 'mal_api#fetch_user_manga_list'
+    get 'tier_lists/filtered_user_lists', to: 'tier_lists#filtered_user_lists'
 
     resources :users, only: [:show, :create] do
       member do
@@ -34,11 +35,14 @@ Rails.application.routes.draw do
     resources :contents, only: [:show, :create, :destroy]
 
     resources :tier_lists do
+      get 'filtered_user_lists', on: :collection
       member do
         get 'tiers'
         post 'upvote'
         post 'downvote'
-      end
+      end  
+      get 'filtered_user_lists', on: :collection
+      
 
       collection do
         get 'recent'

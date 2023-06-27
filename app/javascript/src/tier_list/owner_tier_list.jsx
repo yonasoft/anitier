@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './tier_list.scss';
 import NavBar from '../components/navbar/navbar';
 import { Button } from 'react-bootstrap';
-import { createContent, updateInventory, updateTier } from '../utils/internal_apis/tierlist_apis';
+import { createContent, updateInventory, updateTier, updateTierListPosted } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -17,6 +17,14 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
     const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const handlePostClick = async () => {
+        try {
+            const updatedTierList = await updateTierListPosted(tierList.id, true);
+            setTierList(updatedTierList);
+        } catch (error) {
+            console.error("Error updating tier list:", error);
+        }
+    };
 
     useEffect(() => {
         if (inventoryContentIds) {
@@ -222,9 +230,19 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
                         <div className="col-8">
                             <div className='d-flex justify-content-between flex-column-reverse flex-md-row'>
                                 <div>
-                                    <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
-                                    <a className="mx-2 my-2 btn btn-primary" href="/" title='Make your tier list public'>Post</a>
-                                    <a className="mx-2 my-2 btn btn-primary" href="#">Share</a>
+                                    <div>
+                                        <a className="mx-2 my-2 btn btn-secondary" href="/" title='Finish tier list creation'>Finish</a>
+                                        {!tierList.posted && <Button
+                                            className="mx-2 my-2 btn btn-primary"
+                                            title='Make your tier list public'
+                                            onClick={handlePostClick}
+                                        >
+                                            Post
+                                        </Button>
+                                        }
+                                        <a className="mx-2 my-2 btn btn-primary" href="#">Share</a>
+                                    </div>
+
                                 </div>
                             </div>
 

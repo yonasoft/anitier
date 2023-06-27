@@ -18,6 +18,7 @@ export default function UserTierList({ tierList, tiers }) {
             })
             .catch(error => console.error(error));
     }, [tierList]);
+    
 
 
     return (<React.Fragment>

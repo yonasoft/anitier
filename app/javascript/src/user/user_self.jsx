@@ -2,15 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import './user.scss';
 import NavBar from '../components/navbar/navbar';
 import { ContentType } from '../utils/constants';
-import { updateUser } from '../utils/internal_apis/tierlist_apis';
+import { fetchFilteredUserTierLists, updateUser, deleteTierList } from '../utils/internal_apis/tierlist_apis';
+import UserTierListColumn from '../components/user_tierlist_column/user_tierlist_column';
+import { Modal, Button } from 'react-bootstrap';
 
 
 export default function UserSelf({ userOnPage, setUserOnPage }) {
     const [contentType, setContentType] = useState(ContentType.anime);
     const [listFilter, setListFilter] = useState('all');
+    const [tierLists, setTierLists] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     const handleContentTypeChange = (event) => setContentType(Number(event.target.value));
     const handleListFilterChange = (event) => setListFilter(event.target.value);
+
     const handleBioChange = (event) => {
         setUserOnPage(prevUser => ({ ...prevUser, bio: event.target.value }));
     };
@@ -23,8 +29,23 @@ export default function UserSelf({ userOnPage, setUserOnPage }) {
         setUserOnPage(prevUser => ({ ...prevUser, anilist_url: event.target.value }));
     };
 
+    useEffect(() => {
+        fetchTierLists();
+    }, []);
+
+    const fetchTierLists = async () => {
+        try {
+            const lists = await fetchFilteredUserTierLists(userOnPage.id, listFilter, contentType);
+            console.log('lists', lists);
+            setTierLists(lists);
+        } catch (error) {
+            console.error('Failed to fetch tier lists:', error);
+        }
+    };
 
     const initialRender = useRef(true);
+
+    useEffect(() => { }, [tierLists]);
 
     useEffect(() => {
         if (initialRender.current) {
@@ -40,6 +61,20 @@ export default function UserSelf({ userOnPage, setUserOnPage }) {
         updateUser(userOnPage.id, userOnPage);
     }, [userOnPage]);
 
+    const promptDelete = (id) => {
+        setDeleteId(id);
+        setShowModal(true);
+    }
+
+    const handleDelete = async () => {
+        if (deleteId) {
+            await deleteTierList(deleteId);
+            setShowModal(false);
+            setDeleteId(null);
+            // Fetch lists again after successful deletion
+            fetchTierLists();
+        }
+    }
 
     return (
         <React.Fragment>
@@ -78,17 +113,38 @@ export default function UserSelf({ userOnPage, setUserOnPage }) {
                                 <div className="form-group">
                                     <label>Content Type:</label>
                                     <div>
-                                        <label className="radio-inline"><input type="radio" value={ContentType.anime} checked={contentType === ContentType.anime} onChange={handleContentTypeChange} /> Anime</label>
-                                        <label className="radio-inline"><input type="radio" value={ContentType.manga} checked={contentType === ContentType.manga} onChange={handleContentTypeChange} /> Manga</label>
-                                        <label className="radio-inline"><input type="radio" value={ContentType.character} checked={contentType === ContentType.character} onChange={handleContentTypeChange} /> Characters</label>
+                                        <label className="radio-inline mx-1"><input type="radio" value={ContentType.anime} checked={contentType === ContentType.anime} onChange={handleContentTypeChange} /> Anime</label>
+                                        <label className="radio-inline mx-1"><input type="radio" value={ContentType.manga} checked={contentType === ContentType.manga} onChange={handleContentTypeChange} /> Manga</label>
+                                        <label className="radio-inline mx-1"><input type="radio" value={ContentType.character} checked={contentType === ContentType.character} onChange={handleContentTypeChange} /> Characters</label>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn-primary">Submit</button>
+                                <button type="button" className="btn btn-primary" onClick={fetchTierLists}>Submit</button>
+                                <div className="scrollable-div row">
+                                    {tierLists && tierLists.map(item => (
+                                        // Replace this with your list component
+                                        <UserTierListColumn key={item.id} id={item.id} tierList={item} isOwner={true} onDelete={() => promptDelete(item.id)} />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete Confirmation</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Are you sure you want to delete this TierList?</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
-        </React.Fragment>
+        </React.Fragment >
     );
 }

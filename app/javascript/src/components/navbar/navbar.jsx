@@ -48,7 +48,6 @@ export default function NavBar() {
           <Nav className="me-3">
             <Nav.Link href="/home" className="font-weight-bold text-light">Home</Nav.Link>
             <Nav.Link href="/create" className="font-weight-bold text-light">Create</Nav.Link>
-            <Nav.Link href="/templates" className="font-weight-bold text-light">Templates</Nav.Link>
           </Nav>
           {loggedIn ? (
             <Nav>

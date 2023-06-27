@@ -98,26 +98,29 @@ export async function updateTierListPosted(tierListId, posted) {
 }
 
 
-export async function fetchUserTierLists(userId) {
-    const response = await fetch(`/api/tier_lists/user/${userId}`, {
+export async function fetchFilteredUserTierLists(userId, postedStatus, contentType) {
+
+    const response = await fetch('/api/tier_lists/filtered_user_lists?user_id=' + userId + '&posted_status=' + postedStatus + '&content_type=' + contentType, {
         method: 'GET',
         headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-CSRF-Token': token
         },
     });
 
+
     if (!response.ok) {
-        throw new Error(`Error fetching user's tier lists: ${response.statusText}`);
+        throw new Error(`Error fetching filtered user tier lists: ${response.statusText}`);
     }
 
     const responseData = await response.json();
     return responseData;
 }
 
-export async function fetchPostedUserTierLists(userId) {
-    const response = await fetch(`/api/tier_lists/user/${userId}/posted`, {
-        method: 'GET',
+export async function deleteTierList(id) {
+    const response = await fetch(`/api/tier_lists/${id}`, {
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-Token': token
@@ -125,28 +128,8 @@ export async function fetchPostedUserTierLists(userId) {
     });
 
     if (!response.ok) {
-        throw new Error(`Error fetching posted tier lists: ${response.statusText}`);
+        throw new Error(`Error deleting tier list: ${response.statusText}`);
     }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-export async function fetchUnpostedUserTierLists(userId) {
-    const response = await fetch(`/api/tier_lists/user/${userId}/unposted`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error fetching unposted tier lists: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
 }
 
 
@@ -435,8 +418,6 @@ export async function updateUser(userId, userObject) {
     const updatedUser = await response.json();
     return updatedUser;
 }
-
-
 
 
 
