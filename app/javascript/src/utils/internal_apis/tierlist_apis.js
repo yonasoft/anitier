@@ -76,6 +76,28 @@ export async function updateTierList(id, updatedData) {
     return responseData;
 }
 
+export async function updateTierListPosted(tierListId, posted) {
+    const response = await fetch(`/api/tier_lists/${tierListId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+        body: JSON.stringify({
+            tier_list: {
+                posted: posted
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+
 export async function upvoteTierList(id, userId) {
     const response = await fetch(`/api/tier_lists/${id}/upvote`, {
         method: 'POST',
