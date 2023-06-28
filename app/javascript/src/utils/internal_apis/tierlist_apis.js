@@ -76,25 +76,59 @@ export async function updateTierList(id, updatedData) {
     return responseData;
 }
 
-export async function updateTierListPosted(tierListId, posted) {
-    const response = await fetch(`/api/tier_lists/${tierListId}`, {
-        method: 'PATCH',
+export async function upvoteTierList(id, userId) {
+    const response = await fetch(`/api/tier_lists/${id}/upvote`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-Token': token
         },
-        body: JSON.stringify({
-            tier_list: {
-                posted: posted
-            }
-        })
+        body: JSON.stringify({ user_id: userId })
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Error upvoting tier list: ${response.statusText}`);
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    return responseData;
+}
+
+
+export async function downvoteTierList(id, userId) {
+    const response = await fetch(`/api/tier_lists/${id}/downvote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+        body: JSON.stringify({ user_id: userId })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error downvoting tier list: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
+export async function fetchUserVoteStatus(tierListId, userId) {
+    const response = await fetch(`/api/tier_lists/${tierListId}/user_vote_status?user_id=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error fetching user vote status: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    console.log('vote response', JSON.stringify(responseData));
+    return responseData.user_vote_status;
 }
 
 
@@ -132,57 +166,38 @@ export async function deleteTierList(id) {
     }
 }
 
-
-export async function fetchRecentTierLists() {
-    const response = await fetch(`/api/tier_lists/recent`, {
+export async function fetchMostRecentTierLists() {
+    const response = await fetch('/api/tier_lists/recent', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRF-Token': token
         },
     });
 
     if (!response.ok) {
-        throw new Error(`Error fetching recent tier lists: ${response.statusText}`);
+        throw new Error(`Error fetching most recent tier lists: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
-    return responseData;
+    return await response.json();
 }
 
-export async function fetchPopularTierLists() {
-    const response = await fetch(`/api/tier_lists/popular`, {
+export async function fetchTopTierLists() {
+    const response = await fetch('/api/tier_lists/top', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRF-Token': token
         },
     });
 
     if (!response.ok) {
-        throw new Error(`Error fetching popular tier lists: ${response.statusText}`);
+        throw new Error(`Error fetching top tier lists: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
-    return responseData;
+    return await response.json();
 }
 
-export async function fetchHotTierLists() {
-    const response = await fetch(`/api/tier_lists/hot`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error fetching hot tier lists: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
 
 export async function postTier(tier, tierListId, contentIds = []) {
     const response = await fetch('/api/tiers', {
@@ -345,59 +360,6 @@ export async function createContent(api_id, name, imageUrl) {
     return responseData.id;
 }
 
-// Function to upvote a tier list
-export async function upvoteTierList(tierListId) {
-    const response = await fetch(`/api/tier_lists/${tierListId}/upvote`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error upvoting tier list: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-// Function to downvote a tier list
-export async function downvoteTierList(tierListId) {
-    const response = await fetch(`/api/tier_lists/${tierListId}/downvote`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error downvoting tier list: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-// Function to check the vote status of a user for a specific tier list
-export async function checkUserVote(tierListId, userId) {
-    const response = await fetch(`/api/tier_lists/${tierListId}/vote_status/${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error fetching user vote status: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
 
 export async function updateUser(userId, userObject) {
     const { username, email, password, bio, mal_url, anilist_url } = userObject;

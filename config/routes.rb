@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     resources :contents, only: [:show, :create, :destroy]
 
     resources :tier_lists do
+      get 'user_vote_status', on: :member
       get 'filtered_user_lists', on: :collection
       member do
         get 'tiers'
@@ -46,8 +47,7 @@ Rails.application.routes.draw do
 
       collection do
         get 'recent'
-        get 'popular'
-        get 'hot'
+        get 'top'
       end
     end
   end

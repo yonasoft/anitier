@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_27_204444) do
+ActiveRecord::Schema.define(version: 2023_06_28_124338) do
 
   create_table "contents", force: :cascade do |t|
     t.integer "api_id"
@@ -66,8 +66,6 @@ ActiveRecord::Schema.define(version: 2023_06_27_204444) do
     t.integer "source", default: 0
     t.integer "content_type", default: 0
     t.integer "user_id", null: false
-    t.integer "upvotes", default: 0
-    t.integer "downvotes", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "posted", default: false

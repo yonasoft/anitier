@@ -1,6 +1,7 @@
 module Api
   class TierListsController < ApplicationController
      before_action :set_tier_list, only: [:show, :update, :destroy, :tiers]
+     protect_from_forgery with: :null_session
     
     def index
       @tier_lists = TierList.all
@@ -8,7 +9,7 @@ module Api
     end
 
     def show
-      render json: @tier_list.as_json(include: { tiers: { }, inventory: { }, user: {} })
+      render json: @tier_list.as_json(include: { tiers: { }, inventory: { }, user: {} }, methods: [:upvotes, :downvotes])
     end
 
     def update
@@ -47,13 +48,8 @@ module Api
       render json: @tier_lists
     end
 
-    def popular
-      @tier_lists = TierList.posted.popular
-      render json: @tier_lists
-    end
-
-    def hot
-      @tier_lists = TierList.posted.hot
+    def top
+      @tier_lists = TierList.posted.top
       render json: @tier_lists
     end
 
@@ -82,29 +78,41 @@ module Api
       end
       render json: tiers_with_content_ids
     end
-    
+
     def upvote
       tier_list = TierList.find(params[:id])
-      vote = tier_list.votes.find_or_initialize_by(user_id: current_user.id)
+      vote = tier_list.votes.find_or_initialize_by(user_id: params[:user_id])
       vote.upvoted = true
       vote.downvoted = false
-      vote.save
-      render json: { status: 'success' }
+      if vote.save
+        render json: { status: 'success', upvotes: tier_list.upvotes, downvotes: tier_list.downvotes }
+      else
+        render json: { status: 'error', message: 'Could not save vote' }, status: :unprocessable_entity
+      end
     end
 
     def downvote
       tier_list = TierList.find(params[:id])
-      vote = tier_list.votes.find_or_initialize_by(user_id: current_user.id)
+      vote = tier_list.votes.find_or_initialize_by(user_id: params[:user_id])
       vote.upvoted = false
       vote.downvoted = true
-      vote.save
-      render json: { status: 'success' }
+      if vote.save
+        render json: { status: 'success', upvotes: tier_list.upvotes, downvotes: tier_list.downvotes }
+      else
+        render json: { status: 'error', message: 'Could not save vote' }, status: :unprocessable_entity
+      end
     end
 
-    def user_vote_status(user)
-      vote = votes.find_by(user_id: user.id)
-      return { upvoted: vote.upvoted, downvoted: vote.downvoted } if vote
-      { upvoted: false, downvoted: false }
+    def user_vote_status
+      tier_list = TierList.find(params[:id])
+      user = User.find(params[:user_id])
+      vote = tier_list.votes.find_by(user_id: user.id)
+      status = if vote
+                { upvoted: vote.upvoted, downvoted: vote.downvoted }
+              else
+                { upvoted: false, downvoted: false }
+              end
+      render json: { user_vote_status: status }
     end
 
     def filtered_user_lists
@@ -130,7 +138,7 @@ module Api
     end
 
     def tier_list_params
-      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :upvotes, :downvotes, :posted)
+      params.require(:tier_list).permit(:title, :description, :source, :content_type, :user_id, :posted)
     end
   end
 end
