@@ -13,7 +13,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Modal } from 'react-bootstrap';
 
 
-export default function OwnerTierList({ tierList, setTierList, inventoryContentIds, setInventoryContentIds, tiers, setTiers, allContentsAsApi }) {
+export default function OwnerTierList({ tierList, setTierList, inventoryContentIds, setInventoryContentIds, tiers, setTiers, allContentsAsApi, setAllContentsAsApi }) {
 
 
     const [showModal, setShowModal] = useState(false);

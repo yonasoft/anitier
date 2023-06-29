@@ -64,7 +64,7 @@ export default function TierList({ tierListId }) {
             {
                 loading ? 'Loading...' :
                     userId === tierList.user_id ?
-                        <OwnerTierList tierList={tierList} setTierList={setTierList} inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} tiers={tiers} setTiers={setTiers} allContentsAsApi={allContentsAsApi} />
+                        <OwnerTierList tierList={tierList} setTierList={setTierList} inventoryContentIds={inventoryContentIds} setInventoryContentIds={setInventoryContentIds} tiers={tiers} setTiers={setTiers} allContentsAsApi={allContentsAsApi} setAllContentsAsApi={setAllContentsAsApi} />
                         :
                         <UserTierList tierList={tierList} tiers={tiers} />
             }
