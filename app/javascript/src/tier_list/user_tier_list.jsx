@@ -7,7 +7,7 @@ import Tier from '../components/tier/tier';
 import { ContentType } from '../utils/constants';
 import TierNonDroppable from '../components/tier/tier_nondroppable';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Modal } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 
 
 export default function UserTierList({ tierList, tiers }) {
@@ -65,7 +65,7 @@ export default function UserTierList({ tierList, tiers }) {
                             </CopyToClipboard>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={handleCloseShareModal}>
+                            <Button variant="primary" onClick={handleCloseShareModal}>
                                 Close
                             </Button>
                         </Modal.Footer>

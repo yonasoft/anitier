@@ -306,7 +306,7 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
                                 <p>Copy the link below to share your Tier List:</p>
                                 <input type="text" readOnly value={`${window.location.origin}/tierlist/${tierList.id}`} />
                                 <CopyToClipboard text={`${window.location.origin}/tierlist/${tierList.id}`}>
-                                    <Button variant="secondary">Copy to Clipboard</Button>
+                                    <Button variant="primary">Copy to Clipboard</Button>
                                 </CopyToClipboard>
                             </Modal.Body>
                             <Modal.Footer>
