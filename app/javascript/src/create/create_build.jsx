@@ -270,7 +270,6 @@ export default function CreateBuild({ tierListId }) {
                             {showAlert && <Alert variant={alertVariant} onClose={() => setShowAlert(false)} dismissible>
                                 {alertMessage}
                             </Alert>}
-                            <div><a className="btn btn-primary text-light my-2" href="#">Share</a></div>
                             <div id="ranks" className="row">
                                 {tiers && tiers.map((tier, index) => (
                                     <Tier

@@ -9,11 +9,15 @@ import { ContentType } from '../utils/constants';
 import Inventory from '../components/inventory/inventory';
 import Tier from '../components/tier/tier';
 import { DragDropContext } from 'react-beautiful-dnd';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Modal } from 'react-bootstrap';
+
 
 export default function OwnerTierList({ tierList, setTierList, inventoryContentIds, setInventoryContentIds, tiers, setTiers, allContentsAsApi }) {
 
 
     const [showModal, setShowModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const handleInputChange = (event) => { setTierList({ ...tierList, [event.target.id]: event.target.value }); }
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
@@ -193,10 +197,15 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
         }
     };
 
+    const handleOpenShareModal = () => setShowShareModal(true);
+    const handleCloseShareModal = () => setShowShareModal(false);
+
+
 
     if (!tierList) return 'Loading...';
 
     return (
+
         <React.Fragment>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <NavBar />
@@ -240,7 +249,9 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
                                             Post
                                         </Button>
                                         }
-                                        <a className="mx-2 my-2 btn btn-primary" href="#">Share</a>
+                                        {tierList.posted &&
+                                            <button className="mx-2 my-2 btn btn-primary" onClick={handleOpenShareModal}>Share</button>
+                                        }
                                     </div>
 
                                 </div>
@@ -286,8 +297,28 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
                             )}
                         </div>
                     </div>
+                    {showShareModal && (
+                        <Modal show={showShareModal} onHide={handleCloseShareModal}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Share this Tier List</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <p>Copy the link below to share your Tier List:</p>
+                                <input type="text" readOnly value={`${window.location.origin}/tierlist/${tierList.id}`} />
+                                <CopyToClipboard text={`${window.location.origin}/tierlist/${tierList.id}`}>
+                                    <Button variant="secondary">Copy to Clipboard</Button>
+                                </CopyToClipboard>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleCloseShareModal}>
+                                    Close
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    )}
                 </div>
             </DragDropContext>
         </React.Fragment>
+
     );
 }
