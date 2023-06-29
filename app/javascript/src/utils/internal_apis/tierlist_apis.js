@@ -320,7 +320,6 @@ export async function updateInventory(inventoryId, contentIds = []) {
     return responseData;
 }
 
-// Fetch inventory function
 export async function fetchInventory(inventoryId) {
     const response = await fetch(`/api/inventories/${inventoryId}`, {
         method: 'GET',
@@ -337,7 +336,6 @@ export async function fetchInventory(inventoryId) {
     const responseData = await response.json();
     return responseData;
 }
-
 
 export async function fetchContentModel(contentId) {
     const response = await fetch(`/api/contents/${contentId}`, {
@@ -402,8 +400,3 @@ export async function updateUser(userId, userObject) {
     const updatedUser = await response.json();
     return updatedUser;
 }
-
-
-
-
-

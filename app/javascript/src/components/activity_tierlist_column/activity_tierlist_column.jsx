@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { downvoteTierList, fetchContentModel, fetchTierList, fetchTiersFromTierList, fetchUserVoteStatus, upvoteTierList } from '../../utils/internal_apis/tierlist_apis';
-import { fetchUserState } from '../../utils/internal_apis/auth_api';
+import { fetchUserDataById, fetchUserState } from '../../utils/internal_apis/auth_api';
 import './activity_tierlist_column.scss';
 
 export default function ActivityTierListColumn({ tierListId }) {
 
     const [tierList, setTierList] = useState({});
     const [tiers, setTiers] = useState([]);
+    const [tierListOwner, setTierListOwner] = useState({});//[tierListOwner,setTierListOwner]    
     const [user, setUser] = useState(null);
     const [contentImages, setContentImages] = useState([]);
     const [userVote, setUserVote] = useState(null);
@@ -46,6 +47,8 @@ export default function ActivityTierListColumn({ tierListId }) {
             console.error(error);
         }
     }
+
+
 
     useEffect(() => {
         fetchTiersFromTierList(tierListId).then((data) => {
@@ -94,6 +97,16 @@ export default function ActivityTierListColumn({ tierListId }) {
         fetchVoteStatus();
     }, [tierList, user]);
 
+    useEffect(() => {
+        fetchUserDataById(tierList.user_id)
+            .then(userData => {
+                setTierListOwner(userData)
+                console.log('user data', userData);
+            })
+            .catch(error => console.error(error));
+    }, [tierList]);
+
+
     const handleUpvote = async () => {
         try {
             await upvoteTierList(tierListId, user.user_id);
@@ -119,7 +132,7 @@ export default function ActivityTierListColumn({ tierListId }) {
     };
 
     return (
-        <div className="column card col-12 mx-2 my-2 bg-white" >
+        <div className="column card col-12 mx-2 my-1 bg-white" >
             <div className="row align-items-center">
 
                 {user && user.logged_in && (
@@ -136,7 +149,8 @@ export default function ActivityTierListColumn({ tierListId }) {
                 )}
 
                 <div className={(user && user.logged_in) ? 'col-11' : 'col-12'} onClick={handleTierListClick}>
-                    <h4 className='card-title'>{tierList.title}</h4>
+                    <h5 className='card-title'>{tierList.title}</h5>
+                    <p>by <a href={`/user/${tierListOwner.id}`}>{tierListOwner.username}</a></p>
                     <p style={{ display: '-webkit-box', WebkitLineClamp: '3', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tierList.description}</p>
                     <div className="images-row row"> {contentImages.map((image, index) => {
                         return (
