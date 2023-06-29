@@ -41,14 +41,13 @@ export default function ActivityTierListColumn({ tierListId }) {
     const fetchTierListData = async () => {
         try {
             const data = await fetchTierList(tierListId);
+            console.log('tierlist data', data);
             setTierList(data);
             setVotes(data.upvotes - data.downvotes);
         } catch (error) {
             console.error(error);
         }
     }
-
-
 
     useEffect(() => {
         fetchTiersFromTierList(tierListId).then((data) => {
@@ -98,13 +97,15 @@ export default function ActivityTierListColumn({ tierListId }) {
     }, [tierList, user]);
 
     useEffect(() => {
-        fetchUserDataById(tierList.user_id)
-            .then(userData => {
-                setTierListOwner(userData)
-                console.log('user data', userData);
-            })
-            .catch(error => console.error(error));
-    }, [tierList]);
+        if (tierList.user_id) {  // only run this if tierList.user_id is not undefined
+            fetchUserDataById(tierList.user_id)
+                .then(userData => {
+                    setTierListOwner(userData)
+                    console.log('user data', userData);
+                })
+                .catch(error => console.error(error));
+        }
+    }, [tierList]); 
 
 
     const handleUpvote = async () => {

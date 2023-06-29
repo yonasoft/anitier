@@ -37,8 +37,7 @@ gem 'acts_as_list'
 
 gem 'dotenv-rails', groups: [:development, :test]
 
-
-
+gem 'pg_search'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -69,7 +68,7 @@ end
 group :production do
   # Use pg as the database for Active Record
   gem 'pg', '~> 1.4.3'
-  gem 'pg_search'
+  
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

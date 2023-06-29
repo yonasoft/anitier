@@ -15,7 +15,7 @@ export default function Activity() {
       const data = await fetchMostRecentTierLists();
       console.log('activity: most recet tier list', data);
       setActivities(data);
-    } else if (selectedOption === 'Top') {
+    } else if (selectedOption === 'top') {
       const data = await fetchTopTierLists();
       console.log('activity: top tier list', data);
       setActivities(data);
@@ -41,7 +41,7 @@ export default function Activity() {
               <div className="btn-group ms-auto">
                 <select defaultValue="recent" className="form-select form-select-lg" aria-label=" example" onChange={e => setSelectedOption(e.target.value)}>
                   <option value="recent">Recent</option>
-                  <option value="Top">Top</option>
+                  <option value="top">Top</option>
                 </select>
               </div>
             </div>

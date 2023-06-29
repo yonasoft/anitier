@@ -1,4 +1,5 @@
 class TierList < ApplicationRecord
+  require 'pg_search'
   include PgSearch::Model
   
   pg_search_scope :search_full_text,
@@ -28,7 +29,7 @@ class TierList < ApplicationRecord
   scope :posted, -> { where(posted: true) }
   scope :unposted, -> { where(posted: false) }
   scope :recent, -> { order(created_at: :desc) }
-  scope :top, -> { order(Arel.sql('(upvotes - downvotes) DESC')) }
+  scope :top, -> { posted.order(Arel.sql('(upvotes - downvotes) DESC')) }
   scope :hot, -> { where('created_at >= ?', 1.week.ago).order('(upvotes - downvotes) DESC') }
 
   def create_inventory
