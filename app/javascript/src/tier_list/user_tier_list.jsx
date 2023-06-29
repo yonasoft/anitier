@@ -33,46 +33,47 @@ export default function UserTierList({ tierList, tiers }) {
 
         <React.Fragment>
             <NavBar />
-            tierList.posted?
-            <div className="container bg-light pa-3">
-                <div className="row">
-                    <div className="col-12">
-                        <h1>{tierList.title}</h1>
-                        <h5>by <a href={`/user/${user.id}`}>{user.username}</a></h5>
-                        <p>{tierList.description}</p>
-                    </div>
-                    <div className="col-12">
-                        <div><button className="mx-2 my-2 btn btn-primary" onClick={handleOpenShareModal}>Share</button></div>
-                        <div id="ranks" className="row">
-                            {tiers && tiers.map((tier, index) => (
-                                <TierNonDroppable
-                                    key={index} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
-                                />
-                            ))}
+            {tierList.posted ?
+                <div className="container bg-light pa-3">
+                    <div className="row">
+                        <div className="col-12">
+                            <h1>{tierList.title}</h1>
+                            <h5>by <a href={`/user/${user.id}`}>{user.username}</a></h5>
+                            <p>{tierList.description}</p>
+                        </div>
+                        <div className="col-12">
+                            <div><button className="mx-2 my-2 btn btn-primary" onClick={handleOpenShareModal}>Share</button></div>
+                            <div id="ranks" className="row">
+                                {tiers && tiers.map((tier, index) => (
+                                    <TierNonDroppable
+                                        key={index} tier={tier} tierIndex={index} source={tierList.source} contentType={ContentType[tierList.content_type]}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-                {showShareModal && (
-                    <Modal show={showShareModal} onHide={handleCloseShareModal}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Share this Tier List</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>Copy the link below to share your Tier List:</p>
-                            <input type="text" readOnly value={`${window.location.origin}/tierlist/${tierList.id}`} />
-                            <CopyToClipboard text={`${window.location.origin}/tierlist/${tierList.id}`}>
-                                <Button variant="secondary">Copy to Clipboard</Button>
-                            </CopyToClipboard>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="primary" onClick={handleCloseShareModal}>
-                                Close
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                )}
+                    {showShareModal && (
+                        <Modal show={showShareModal} onHide={handleCloseShareModal}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Share this Tier List</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <p>Copy the link below to share your Tier List:</p>
+                                <input type="text" readOnly value={`${window.location.origin}/tierlist/${tierList.id}`} />
+                                <CopyToClipboard text={`${window.location.origin}/tierlist/${tierList.id}`}>
+                                    <Button variant="secondary">Copy to Clipboard</Button>
+                                </CopyToClipboard>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="primary" onClick={handleCloseShareModal}>
+                                    Close
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    )}
 
-            </div>
-            : <h2>User has not posted this Tier List yet(It has not been made public)</h2>
+                </div>
+                : <h2>User has not posted this Tier List yet(It has not been made public)</h2>
+            }
         </React.Fragment>)
 }
