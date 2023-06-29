@@ -49,8 +49,10 @@ module Api
     end
 
     def top
-      @tier_lists = TierList.posted.top
-      render json: @tier_lists
+      tier_lists = TierList.where(posted: true).includes(:votes)
+      tier_lists = tier_lists.to_a
+      tier_lists.sort! { |a, b| (b.upvotes - b.downvotes) <=> (a.upvotes - a.downvotes) }
+      render json: tier_lists
     end
 
     def user_lists
