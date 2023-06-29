@@ -273,6 +273,23 @@ export async function fetchTiersFromTierList(tierListId) {
     });
 }
 
+export async function fetchSearchResults(query, type) {
+    const response = await fetch(`/api/tier_lists/search?query=${query}&type=${type}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error fetching search results: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
 
 export async function updateTier(tierId, contentIds = []) {
     console.log(`Updating tier ${tierId} with content_ids: ${contentIds}`);

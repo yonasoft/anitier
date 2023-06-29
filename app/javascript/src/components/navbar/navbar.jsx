@@ -47,7 +47,8 @@ export default function NavBar() {
         <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
           <Nav className="me-3">
             <Nav.Link href="/home" className="font-weight-bold text-light">Home</Nav.Link>
-            <Nav.Link href="/create" className="font-weight-bold text-light">Create</Nav.Link>
+            <Nav.Link href="/search" className="font-weight-bold text-light">Search</Nav.Link>
+            <Nav.Link href="/create" className="font-weight-bold text-light">Create</Nav.Link>   
           </Nav>
           {loggedIn ? (
             <Nav>

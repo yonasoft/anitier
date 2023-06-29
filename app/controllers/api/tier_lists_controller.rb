@@ -131,6 +131,15 @@ module Api
       render json: @tier_lists
     end
 
+    def search
+      query = params[:query]
+      type = params[:type]
+      @tier_lists = TierList.where(content_type: type).search_full_text(query)
+      @tier_lists = @tier_lists.to_a.sort_by(&:created_at).reverse
+      
+      render json: @tier_lists
+    end
+
     private
 
     def set_tier_list

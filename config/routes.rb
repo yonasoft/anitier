@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get '/login' => 'static_pages#login'
   get '/home' => 'static_pages#home'
   get '/create' => 'static_pages#create'
-  get '/templates' => 'static_pages#templates'
+  get '/search' => 'static_pages#search_page'
   get '/tierlist/:id' => 'static_pages#tier_list'
   get '/templatetierlist/:id' => 'static_pages#template_tier_list'
   get '/user/:id' => 'static_pages#user'
@@ -36,18 +36,16 @@ Rails.application.routes.draw do
 
     resources :tier_lists do
       get 'user_vote_status', on: :member
-      get 'filtered_user_lists', on: :collection
       member do
         get 'tiers'
         post 'upvote'
         post 'downvote'
       end  
-      get 'filtered_user_lists', on: :collection
-      
-
       collection do
+        get :search
         get 'recent'
         get 'top'
+        get 'filtered_user_lists'
       end
     end
   end

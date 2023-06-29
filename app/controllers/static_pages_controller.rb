@@ -23,7 +23,7 @@ class StaticPagesController < ApplicationController
     render 'tier_list'
   end
 
-  def templates
+  def search_page
   end
 
   def user

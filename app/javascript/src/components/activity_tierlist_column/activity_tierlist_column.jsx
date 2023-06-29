@@ -151,7 +151,7 @@ export default function ActivityTierListColumn({ tierListId }) {
                 <div className={(user && user.logged_in) ? 'col-11' : 'col-12'} onClick={handleTierListClick}>
                     <h5 className='card-title'>{tierList.title}</h5>
                     <p>by <a href={`/user/${tierListOwner.id}`}>{tierListOwner.username}</a></p>
-                    <p style={{ display: '-webkit-box', WebkitLineClamp: '3', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tierList.description}</p>
+                    <p style={{ display: '-webkit-box', WebkitLineClamp: '3', WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tierList.description}</p>
                     <div className="images-row row"> {contentImages.map((image, index) => {
                         return (
                             <div className='col-2 col-lg-1 p-0 img-container' key={index}>

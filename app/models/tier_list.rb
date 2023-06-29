@@ -1,4 +1,15 @@
 class TierList < ApplicationRecord
+  include PgSearch::Model
+  
+  pg_search_scope :search_full_text,
+                  against: [:title, :description],
+                  associated_against: {
+                    user: :username
+                  },
+                  using: {
+                    tsearch: {prefix: true} 
+                  }
+                  
   after_create :create_inventory
 
   belongs_to :user, optional: true
@@ -33,4 +44,6 @@ class TierList < ApplicationRecord
   def downvotes
     self.votes.where(downvoted: true).count
   end
+
+  
 end

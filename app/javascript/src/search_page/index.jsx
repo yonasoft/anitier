@@ -1,11 +1,11 @@
-// index.jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Create from './create';
+import SearchPage from './search_page';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-        <Create />,
+        <SearchPage />,
         document.body.appendChild(document.createElement('div')),
     )
 })
