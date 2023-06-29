@@ -45,6 +45,4 @@ class TierList < ApplicationRecord
   def downvotes
     self.votes.where(downvoted: true).count
   end
-
-  
 end

@@ -36,11 +36,23 @@ module Api
     end
 
     def destroy
-      if @tier_list.destroy
-        render json: { message: 'Tier list deleted successfully' }, status: :ok
-      else
-        render json: { error: 'Failed to delete tier list' }, status: :unprocessable_entity
+      ActiveRecord::Base.transaction do
+        @tier_list.votes.each do |vote|
+          Rails.logger.info("Deleting vote: #{vote.id}")
+          vote.destroy!
+        end
+        @tier_list.tiers.each do |tier|
+          Rails.logger.info("Deleting tier: #{tier.id}")
+          tier.destroy!
+        end
+        Rails.logger.info("Deleting inventory: #{@tier_list.inventory.id}")
+        @tier_list.inventory.destroy!
+        Rails.logger.info("Deleting tier_list: #{@tier_list.id}")
+        @tier_list.destroy!
       end
+      render json: { message: 'Tier list deleted successfully' }, status: :ok
+    rescue => e
+      render json: { error: 'Failed to delete tier list', detail: e.message }, status: :unprocessable_entity
     end
 
     def recent
@@ -141,6 +153,7 @@ module Api
       
       render json: @tier_lists
     end
+    
 
     private
 
