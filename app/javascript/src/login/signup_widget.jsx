@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './login.scss';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { login, signup } from '../utils/internal_apis/auth_api';
+import { fetchUserDataById, login, signup } from '../utils/internal_apis/auth_api';
 
 export default function SignUpWidget({ setRequireSignup }) {
 
@@ -45,12 +45,13 @@ export default function SignUpWidget({ setRequireSignup }) {
         }
 
         try {
-            await signup(username, email, password);
+            const signupData = await signup(username, email, password);
             await login(username, password);
+            console.log('signup', signupData);
             handleShow();
             setTimeout(() => {
                 handleClose();
-                window.location.href = '/home';
+                window.location.href = `/user/${signupData.user_id}`;
             }, 3000);
         } catch (error) {
             setError(error.message);

@@ -19,14 +19,13 @@ export default function UserTierList({ tierList, tiers }) {
 
 
     useEffect(() => {
-        fetchUserDataById(tierList.user_id)
+        tierList && tierList.user_id && fetchUserDataById(tierList.user_id)
             .then(userData => {
                 setUser(userData)
                 console.log('user data', userData);
             })
             .catch(error => console.error(error));
     }, [tierList]);
-
 
 
     return (

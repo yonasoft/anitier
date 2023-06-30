@@ -105,7 +105,7 @@ export default function ActivityTierListColumn({ tierListId }) {
                 })
                 .catch(error => console.error(error));
         }
-    }, [tierList]); 
+    }, [tierList]);
 
 
     const handleUpvote = async () => {
@@ -149,7 +149,7 @@ export default function ActivityTierListColumn({ tierListId }) {
                     </div>
                 )}
 
-                <div className={(user && user.logged_in) ? 'col-11' : 'col-12'} onClick={handleTierListClick}>
+                <div className={`info ${(user && user.logged_in) ? 'col-11' : 'col-12'}`} onClick={handleTierListClick}>
                     <h5 className='card-title'>{tierList.title}</h5>
                     <p>by <a href={`/user/${tierListOwner.id}`}>{tierListOwner.username}</a></p>
                     <p style={{ display: '-webkit-box', WebkitLineClamp: '3', WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tierList.description}</p>
