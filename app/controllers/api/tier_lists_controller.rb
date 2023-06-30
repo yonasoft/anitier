@@ -147,13 +147,19 @@ module Api
 
     def search
       query = params[:query]
-      type = params[:type]
-      @tier_lists = TierList.where(content_type: type).search_full_text(query)
+      type = params[:type].to_i
+      if type == -1 # Search across all types
+        @tier_lists = []
+        3.times do |i|
+          @tier_lists.concat(TierList.where(content_type: i).search_full_text(query))
+        end
+      else # Search for specific type
+        @tier_lists = TierList.where(content_type: type).search_full_text(query)
+      end
       @tier_lists = @tier_lists.to_a.sort_by(&:created_at).reverse
-      
+          
       render json: @tier_lists
     end
-    
 
     private
 

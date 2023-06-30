@@ -1,9 +1,9 @@
 export const ContentType = {
+    all: -1,
     anime: 0,
     manga: 1,
     character: 2,
 };
-
 export const AniListStatus = {
     CURRENT: "CURRENT",
     COMPLETED: "COMPLETED",
