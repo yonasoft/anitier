@@ -43,9 +43,13 @@ export default function SearchPage() {
               </div>
             </div>
             <div id="results" className="row bg-light">
-              {searchResults && searchResults.map(result => (
+              {searchResults &&
+                searchResults.length < 0 ?
+                (<h3 className="col-12">No results found</h3>)
+                :
+                (searchResults.map(result => (
                 <ActivityTierListColumn key={result.id} tierListId={result.id} />
-              ))}
+              )))}
             </div>
           </div>
         </div>
