@@ -1,5 +1,5 @@
 #  AniTier
-https://www.anitier.com/home
+https://www.anitier.com/
 
 # TBA
 
