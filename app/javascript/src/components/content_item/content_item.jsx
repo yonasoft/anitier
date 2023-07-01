@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './content_item.scss';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { Draggable } from 'react-beautiful-dnd';
 
 export default function ContentItem({ id, item, index }) {
-    console.log('item', item);
     if (!item) {
         return null;
     }
