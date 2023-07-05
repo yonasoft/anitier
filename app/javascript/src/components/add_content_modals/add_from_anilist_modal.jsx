@@ -61,7 +61,7 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                 if (content.media) {
                     const id = content.media.id;
                     const image = (content.media.main_picture?.large || content.media.coverImage?.large || content.media.main_picture?.medium || content.media.image.large || content.media.image || content.media.images.jpg.image_url);
-                    const name = content.media.title?.english || content.media.title?.romaji || content.media?.title || (content.media.name?.first ? `${content.media.name.first} ${content.media.name.last}` : content.media.name);
+                    const name = content.media.title?.english || content.media.title?.romaji || content.media?.title || (content.media.name?.first ? `${content.media.name.first} ${content.media.name.last}` : content.media.name?.first || content.media.name?.last || "Unknown");
                     promises.push(addContentToInventory(id, name, image));
                 }
             }
@@ -77,8 +77,6 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
         }
     }
 
-
-
     return (
         <Modal show={showModal} onHide={handleCloseModal} size="xl" className="my-modal">
             <Modal.Header closeButton>
@@ -93,9 +91,9 @@ export default function AddFromAniListModal({ showModal, handleCloseModal, inven
                         </form>
                         <div className="scrollable-results py-2 w-100 h-80">
                             {isLoading ? <BeatLoader color="#123abc" loading={isLoading} size={15} /> :
-                                searchResults.map(result =>
+                                (searchResults && searchResults.map(result =>
                                     <SearchResult key={result.id} result={result} contentType={ContentType[tierList.content_type]} inventory={inventory} addContentToInventory={addContentToInventory} isApiAlreadyAdded={isApiAlreadyAdded} />
-                                )
+                                ))
                             }
                         </div>
                     </Tab>

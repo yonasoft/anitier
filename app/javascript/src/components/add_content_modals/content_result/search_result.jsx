@@ -5,7 +5,8 @@ import { ContentType } from '../../../utils/constants';
 export default function SearchResult({ result, isApiAlreadyAdded, addContentToInventory }) {
     const id = result?.mal_id || result?.id;
     const image = (result.coverImage?.large || result.main_picture?.large || result.main_picture?.medium || result.images?.jpg?.image_url || result.image.large);
-    const name = result.title?.english || result.title?.romaji || result?.title || (result.name.first ? `${result.name.first} ${result.name.last}` : result.name);
+    const name = result.title?.english || result.title?.romaji || result?.title || (result.name?.first + ' ' + result.name?.last) || result?.name || "Unknown";
+
     return (
         <div className="result-item d-flex justify-content-between align-items-center py-2 px-3">
             <div className="d-flex align-items-center">

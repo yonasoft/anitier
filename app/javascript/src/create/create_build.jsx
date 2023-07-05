@@ -266,7 +266,7 @@ export default function CreateBuild({ tierListId }) {
                                 <Button className="mx-2 my-2 btn btn-primary" onClick={onPost} title='Make your tier list public'>Post</Button>
                             </div>
                         </div>
-                        <div className="col-8">
+                        <div className="col-8 mt-5">
                             {showAlert && <Alert variant={alertVariant} onClose={() => setShowAlert(false)} dismissible>
                                 {alertMessage}
                             </Alert>}
