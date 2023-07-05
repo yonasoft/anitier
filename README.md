@@ -12,13 +12,13 @@
  3. [Screenshots](#screenshots)
 
 ## Intro 
-**What is AniTier?**
+**What is AniTier?**  
 AniTier is tier list maker web application for making anime, manga, or character tier lists. You can also share and discover other user's tier list.
 
-**Why AniTier?**
+**Why AniTier?**  
 Regarding making tier lists for anime and manga, it is a lot faster and more convenient with AniTier than general tier list makers. There's no need to manually upload images or add titles. You can search up the title you want to add and drag and drop them in the desired tier. You can also import user's watch lists from Anilist or MyAnimeList!
 
-**Who is AniTier for?**
+**Who is AniTier for?**  
 AniTier is for anime and manga fans that like to rank titles or characters, whether it'd be your top shounen Anime or who you think are the strongest hashiras in Demon Slayer!
 
 ## Technologies 
