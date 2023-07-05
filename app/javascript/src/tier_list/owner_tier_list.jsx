@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './tier_list.scss';
 import NavBar from '../components/navbar/navbar';
 import { Button } from 'react-bootstrap';
-import { createContent, updateInventory, updateTier, updateTierListPosted } from '../utils/internal_apis/tierlist_apis';
+import { createContent, fetchContentModel, updateInventory, updateTier, updateTierListPosted } from '../utils/internal_apis/tierlist_apis';
 import AddFromAniListModal from '../components/add_content_modals/add_from_anilist_modal';
 import AddFromMALModal from '../components/add_content_modals/add_from_mal_modal';
 import { ContentType } from '../utils/constants';
@@ -43,6 +43,10 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
     }, [inventoryContentIds, tierList]);
 
     useEffect(() => {
+        populateAllContentsApi();
+    }, [inventoryContentIds, tiers]);
+
+    useEffect(() => {
         tiers && tiers.forEach(tier => {
             console.log('tier id when updated and content ids', tier.id, tier.content_ids);
             updateTier(tier.id, tier.content_ids).then(data => {
@@ -77,6 +81,31 @@ export default function OwnerTierList({ tierList, setTierList, inventoryContentI
             console.error("Error adding content to inventory:", error);
         }
     };
+
+    const populateAllContentsApi = async () => {
+        if (inventoryContentIds) {
+            const apiIds = [];
+            for (let id of inventoryContentIds) {
+                const content = await fetchContentModel(id);
+                apiIds.push(content.api_id);
+            }
+            setAllContentsAsApi(apiIds);
+        }
+        if (tiers) {
+            let tierApiIds = [];
+            for (let tier of tiers) {
+                for (let id of tier.content_ids) {
+                    const content = await fetchContentModel(id);
+                    tierApiIds.push(content.api_id);
+                }
+            }
+            setAllContentsAsApi(prevApiIds => [...(prevApiIds || []), ...tierApiIds]);
+        }
+    };
+    useEffect(() => {
+        populateAllContentsApi();
+    }, [inventoryContentIds, tiers]);
+
 
     const adjustTier = (tier, sourceIndex, destinationIndex, draggableId) => {
         console.log('tier in updateTier', tier);
