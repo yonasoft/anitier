@@ -4,8 +4,8 @@ import { BeatLoader } from "react-spinners";
 import { fetchUserAnimeList, fetchUserMangaList, searchMALContent } from '../../utils/external_apis/mal_api';
 import { ContentType, AnimeStatus, MangaStatus } from '../../utils/constants';
 import './add_modal.scss';
-import SearchResult from './content_result/search_result';
-import SearchResultImport from './content_result/search_result_import';
+import { SearchResult, SearchResultImport } from './content_result/search_result';
+
 
 
 export default function AddFromMALModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList, isApiAlreadyAdded }) {
@@ -64,7 +64,7 @@ export default function AddFromMALModal({ showModal, handleCloseModal, inventory
 
         userData.forEach(async content => {
             const contentNode = content.node;
-            
+
             console.log('content', content);
             const id = ContentType[tierList.content_type] === ContentType.character ? contentNode.mal_id : contentNode.id;
             const name = contentNode.title

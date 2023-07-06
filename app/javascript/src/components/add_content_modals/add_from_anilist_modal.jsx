@@ -4,8 +4,7 @@ import { ContentType, AniListStatus } from '../../utils/constants'
 import { searchAniListContent, fetchUserAniListAnimeList, fetchUserAniListMangaList } from '../../utils/external_apis/anilist_api';
 import { BeatLoader } from "react-spinners";
 import './add_modal.scss';
-import SearchResultImport from './content_result/search_result_import';
-import SearchResult from './content_result/search_result';
+import { SearchResult, SearchResultImport } from './content_result/search_result';
 
 export default function AddFromAniListModal({ showModal, handleCloseModal, inventory, addContentToInventory, tierList, isApiAlreadyAdded }) {
 
