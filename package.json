@@ -32,5 +32,9 @@
     "react-dom": "^16.14.0",
     "react-gesture-responder": "^2.1.0",
     "react-spinners": "^0.13.8"
+  },
+
+  "engines": {
+    "node": "16.x"
   }
 }
