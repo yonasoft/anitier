@@ -23,7 +23,7 @@ export default function NavBar() {
     }).catch(error => console.error(error));
 
     return () => {
-      isMounted = false; // Change the flag when component unmounts
+      isMounted = false; 
     }
 
   }, []);
