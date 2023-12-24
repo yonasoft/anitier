@@ -5,7 +5,6 @@
 
 import Rails from "@rails/ujs"
 import * as ActiveStorage from "@rails/activestorage"
-import "channels"
 import 'bootstrap'
 import 'jquery'
 global.fetch = require('node-fetch');
@@ -15,11 +14,3 @@ global.AbortController = AbortController;
 Rails.start()
 ActiveStorage.start()
 
-// Only run HMR in development
-if (process.env.NODE_ENV === 'development') {
-  if (module.hot) {
-    module.hot.accept();
-  }
-}
-
-// ... rest of your JavaScript and React setup

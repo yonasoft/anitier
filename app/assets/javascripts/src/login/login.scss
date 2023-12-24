@@ -1,0 +1,21 @@
+#welcome-area {
+    background-color: #5993F0;
+    height: 95vh;
+}
+
+#login-area {
+    background-image: url('../../../assets/images/welcome-background.png');
+    height: 95vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#login-widget,
+#signup-widget {
+    padding: 40px;
+    width: 80%;
+}
+
+.form-floating {
+    width: 85%;
+}

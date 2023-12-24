@@ -17,7 +17,7 @@
     "turbolinks": "^5.2.0",
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3"
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
     "@mateoaranda/jikanjs": "^1.2.4",
@@ -33,7 +33,6 @@
     "react-gesture-responder": "^2.1.0",
     "react-spinners": "^0.13.8"
   },
-
   "engines": {
     "node": "16.x"
   }

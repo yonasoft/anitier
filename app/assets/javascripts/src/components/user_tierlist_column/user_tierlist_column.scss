@@ -40,11 +40,10 @@
 }
 
 .image {
-    width: 100%;
+    width: auto;
     object-fit: contain;
-    height: 150px;
+    height: 100%;
 }
-
 
 .column {
     cursor: pointer;

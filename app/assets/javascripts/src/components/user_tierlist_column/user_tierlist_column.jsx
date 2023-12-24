@@ -53,13 +53,15 @@ export default function UserTierListColumn({ id, tierList, isOwner, onDelete }) 
                     {isOwner ? <button className='btn btn-danger' onClick={(e) => { e.stopPropagation(); onDelete(); }}>Delete</button> : null}
                 </div>
 
-                    <div className="images-row row">
-                        {contentImages.slice(0, 6).map((image, index) => (
+                <div className='row'>
+                    {contentImages.map((image, index) => {
+                        return (
                             <div className='col-2 p-0 img-container' key={index}>
-                                <img className='image' src={image} alt="content" />
+                                <img className='image' src={image} alt="content image" />
                             </div>
-                        ))}
-                    </div>
+                        )
+                    })}
+                </div>
             </div>
         </div>
     );

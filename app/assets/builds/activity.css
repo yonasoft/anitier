@@ -1,0 +1,108 @@
+/* app/assets/javascripts/src/activity/activity.scss */
+.dropdown-menu {
+  background-color: white;
+}
+
+/* app/assets/javascripts/src/components/navbar/navbar.scss */
+navbar {
+  position: sticky;
+}
+nav {
+  background-color: #3F5C9E;
+  font-size: 1.25rem;
+}
+.login-below {
+  background-color: #5993F0;
+}
+#brand-ani,
+#brand-tier {
+  font-size: 1.75rem;
+}
+#brand-tier {
+  color: #5993F0;
+}
+#login-btn {
+  background-color: #5993F0;
+}
+.btn-transparent {
+  background-color: transparent;
+  color: #fff;
+}
+
+/* app/assets/javascripts/src/components/activity_tierlist_column/activity_tierlist_column.scss */
+.column {
+  min-height: 300px;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: auto;
+}
+.row {
+  height: 100%;
+}
+.img-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image {
+  width: 100%;
+  object-fit: contain;
+  height: auto;
+}
+button {
+  text-align: center;
+  background: none;
+  border: none;
+}
+button img {
+  width: 20px;
+  height: 20px;
+}
+button.upvoted {
+  color: #3F5C9E;
+}
+.row.align-items-center {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.vote-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.vote-section .button-arrow {
+  border: solid gray;
+  border-width: 0 6px 6px 0;
+  display: inline-block;
+  padding: 9px;
+  background: none;
+  box-shadow: none;
+}
+.vote-section p {
+  margin: 10px 0;
+}
+.vote-section .highlight {
+  border-color: #3F5C9E;
+}
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.highlight {
+  background-color: #3F5C9E;
+}
+.card {
+  border-radius: 10px;
+}
+.info {
+  cursor: pointer;
+}
+/*# sourceMappingURL=activity.css.map */

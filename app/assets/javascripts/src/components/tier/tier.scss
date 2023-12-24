@@ -1,0 +1,24 @@
+.tier {
+    overflow: hidden;
+}
+
+.content {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.25rem;
+    background-color: '#f7f7f7';
+    border-bottom: 1px solid black;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.content>div {
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.rank {
+    background-color: "#3F5C9E";
+    width: "75px";
+    border-bottom: 1px solid black;
+}
