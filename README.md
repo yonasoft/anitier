@@ -13,20 +13,14 @@
 
 ## Intro 
 **What is AniTier?**  
-AniTier is a tier list maker web application dedicated to making anime, manga, or character tier lists. Share and discover other user's tier list.
-
-**Why AniTier?**  
-There are general tier list makers out there on the web, but they require users to manually input data. However, with AniTier, you can search or import anime or manga data to your tier list.
-
-**Who is AniTier for?**  
-Anime and Manga enthusiasts who enjoy ranking their favorite titles or characters.
+AniTier is a tier list maker web application dedicated to making anime, manga, or character tier lists where don't need to manually upload images for each title. Search titles and add them or import them from your MyAnimeList or AniList. Share and discover other user's tier lists.
 
 ## Technologies 
 ### Front  End 
 
  - Built with **ReactJS**, **Bootstrap**, **react-bootstrap**.
  - **react-beautiful-dnd** for drag and drop features.
- -  **react-copy-to-clipboard** for on click copy and paste.
+ -  **react-copy-to-clipboard** for on-click copy and paste.
 <br>
 
 ### Back End
