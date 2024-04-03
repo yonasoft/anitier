@@ -18,13 +18,13 @@ AniTier is a web application for making anime, manga, or character tier lists th
 ## Technologies 
 ### Front End 
 
- - Built with **ReactJS**, **Bootstrap**, **react-bootstrap**.
+ - Built with **React** and **Bootstrap**.
  - **react-beautiful-dnd** for drag and drop features.
  -  **react-copy-to-clipboard** for on-click copy and paste.
 <br>
 
 ### Back End
-- **Ruby on Rails** as back end, deployed on **Heroku** with **PostgreSQL**.
+- **Ruby on Rails** as the back end framework, deployed on **Heroku** with **PostgreSQL** as database.
 - **AniList**, **MyAnimeList**, **Jikan** apis for title/character searching and importing of user lists.
 - **pg_search** for search querying.
 
