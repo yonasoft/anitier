@@ -16,7 +16,7 @@
 AniTier is a  web application for making anime, manga, or character tier lists that do not require the manual upload of images for each title, but can be imported from MyAnimeList.net's or AniList's library of over 11,000 titles. Users can also import their lists from MAL or AniList, or other user lists from MAL's and AniList's collective community of over 6 million.
 
 ## Technologies 
-### Front  End 
+### Front End 
 
  - Built with **ReactJS**, **Bootstrap**, **react-bootstrap**.
  - **react-beautiful-dnd** for drag and drop features.
