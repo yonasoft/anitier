@@ -1,6 +1,7 @@
 
 
-##  AniTier 
+##  AniTier (Discontinued)
+### AniTier 2.0 is in the making!
 
  [![image](https://i.ibb.co/J71w4Rb/al.png)](https://www.anitier.com/)  
  Link: https://www.anitier.com/
